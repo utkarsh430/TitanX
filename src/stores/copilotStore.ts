@@ -14,6 +14,7 @@ import {
   type AuditEventType,
 } from '@/lib/audit/auditLog';
 import type { AiState } from '@/lib/constants';
+import type { FleetAlert } from '@/lib/alerts/alertEngine';
 
 export interface FleetFilters {
   search: string;
@@ -65,6 +66,19 @@ interface CopilotState {
   isAuditOpen: boolean;
 
   auditEvents: AuditEvent[];
+
+  /** Predictive alert feed, anchored to real vehicles. */
+  alerts: FleetAlert[];
+  alertRotationIndex: number;
+  toastQueue: FleetAlert[];
+  seededAlerts: boolean;
+
+  pushAlerts: (alerts: FleetAlert[], seeded?: boolean) => void;
+  advanceAlertRotation: () => void;
+  acknowledgeAlert: (id: string) => void;
+  dismissAlert: (id: string) => void;
+  dismissToast: (id: string) => void;
+  clearAlerts: () => void;
 
   setFleet: (response: LiveFeedResponse) => void;
   setFleetError: (message: string) => void;
@@ -149,6 +163,41 @@ export const useCopilotStore = create<CopilotState>((set, get) => ({
   isAuditOpen: false,
 
   auditEvents: [],
+
+  alerts: [],
+  alertRotationIndex: 0,
+  toastQueue: [],
+  seededAlerts: false,
+
+  pushAlerts: (incoming, seeded = false) =>
+    set((state) => ({
+      // Newest first, capped so a long session cannot grow without bound.
+      alerts: [...incoming, ...state.alerts].slice(0, 40),
+      // Seeded alerts populate the board silently; only live arrivals toast.
+      toastQueue: seeded ? state.toastQueue : [...incoming, ...state.toastQueue].slice(0, 3),
+      seededAlerts: seeded ? true : state.seededAlerts,
+    })),
+
+  advanceAlertRotation: () => set((state) => ({ alertRotationIndex: state.alertRotationIndex + 1 })),
+
+  acknowledgeAlert: (id) =>
+    set((state) => ({
+      alerts: state.alerts.map((alert) =>
+        alert.id === id ? { ...alert, acknowledged: true } : alert,
+      ),
+      toastQueue: state.toastQueue.filter((alert) => alert.id !== id),
+    })),
+
+  dismissAlert: (id) =>
+    set((state) => ({
+      alerts: state.alerts.filter((alert) => alert.id !== id),
+      toastQueue: state.toastQueue.filter((alert) => alert.id !== id),
+    })),
+
+  dismissToast: (id) =>
+    set((state) => ({ toastQueue: state.toastQueue.filter((alert) => alert.id !== id) })),
+
+  clearAlerts: () => set({ alerts: [], toastQueue: [], alertRotationIndex: 0, seededAlerts: false }),
 
   setFleet: (response) =>
     set({

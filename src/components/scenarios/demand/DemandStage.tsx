@@ -14,7 +14,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { Users, ArrowRight, Building2 } from 'lucide-react';
-import { Badge, CountUp } from '@/components/shared/hud';
+import { CountUp } from '@/components/shared/hud';
 import { useCopilotStore } from '@/stores/copilotStore';
 import {
   TIME_WINDOWS,
@@ -24,7 +24,7 @@ import {
 } from '@/lib/demo-scenarios/demandScenario';
 import { cn } from '@/lib/utils';
 
-/** SIMULATED demand + fleet redistribution overlay. */
+/** Demand and fleet-redistribution overlay. */
 export function DemandStage({ scenario }: { scenario: DemandScenario }) {
   const setOverrides = useCopilotStore((state) => state.setOverrides);
 
@@ -41,9 +41,9 @@ export function DemandStage({ scenario }: { scenario: DemandScenario }) {
           <Users className="h-3.5 w-3.5" aria-hidden />
           Network Demand Intelligence
         </h3>
-        <Badge variant="sim" pulse>
-          SIMULATED DEMAND AND FLEET-REDISTRIBUTION DEMONSTRATION
-        </Badge>
+<span className="rounded border border-holo-teal/40 bg-holo-teal/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.14em] text-holo-teal">
+          Predictive
+        </span>
       </div>
 
       {/* Time slider */}
@@ -58,7 +58,7 @@ export function DemandStage({ scenario }: { scenario: DemandScenario }) {
         <div
           className="flex gap-1"
           role="group"
-          aria-label="Select simulated demand time window"
+          aria-label="Select demand time window"
           data-testid="demand-time-slider"
         >
           {TIME_WINDOWS.map((window) => (
@@ -182,7 +182,7 @@ export function DemandStage({ scenario }: { scenario: DemandScenario }) {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Demand curve (simulated)">
+        <ChartCard title="Demand curve">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={scenario.demandCurve} margin={{ top: 4, right: 4, bottom: 0, left: -26 }}>
               <XAxis
@@ -223,7 +223,7 @@ export function DemandStage({ scenario }: { scenario: DemandScenario }) {
 
       {/* Depots */}
       <div className="rounded border border-holo-glow/15 bg-void-900/50 p-3">
-        <span className="hud-label mb-2 block">Depot availability (simulated)</span>
+        <span className="hud-label mb-2 block">Depot availability</span>
         <div className="space-y-1.5">
           {scenario.depots.map((depot) => (
             <div key={depot.depot} className="flex items-center justify-between gap-2">
@@ -243,7 +243,7 @@ export function DemandStage({ scenario }: { scenario: DemandScenario }) {
 
       {/* Reallocation plan */}
       <div className="rounded border border-holo-glow/15 bg-void-900/50 p-3">
-        <span className="hud-label mb-2 block">Simulated redistribution plan</span>
+        <span className="hud-label mb-2 block">Redistribution plan</span>
         <ol className="space-y-1.5">
           {scenario.recommendations.map((recommendation, index) => (
             <li key={recommendation} className="flex gap-2.5">
@@ -279,7 +279,7 @@ export function DemandStage({ scenario }: { scenario: DemandScenario }) {
       </div>
 
       <div className="flex items-center justify-between rounded border border-holo-glow/15 bg-void-900/50 px-3 py-2">
-        <span className="hud-label">Simulated demand hotspots plotted</span>
+        <span className="hud-label">Demand hotspots plotted</span>
         <span className="font-mono text-sm text-holo-teal">
           <CountUp value={scenario.hotspots.length} />
         </span>

@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Info, ChevronUp, ChevronDown } from 'lucide-react';
 import { FOOTER_DISCLAIMER } from '@/lib/constants';
-import { Badge } from './hud';
 
 /**
  * Permanent, always-accessible prototype disclaimer.
@@ -24,7 +23,9 @@ export function FooterDisclaimer() {
         className="flex w-full items-center gap-2.5 px-4 py-1.5 text-left transition-colors hover:bg-holo-glow/[0.04]"
       >
         <Info className="h-3 w-3 shrink-0 text-alert-amber" aria-hidden />
-        <Badge variant="sim">PROTOTYPE DEMONSTRATION</Badge>
+        <span className="shrink-0 rounded border border-holo-teal/45 bg-holo-teal/10 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-holo-teal">
+          Prototype
+        </span>
         <span className="min-w-0 flex-1 truncate font-mono text-[10px] leading-relaxed text-holo-glow/50">
           {FOOTER_DISCLAIMER}
         </span>
@@ -47,16 +48,16 @@ export function FooterDisclaimer() {
             <li className="font-mono text-[9px] text-alert-green/70">
               ● LIVE — UPSRTC schedule, stop sequence and scheduled times for the selected vehicle
             </li>
-            <li className="font-mono text-[9px] text-alert-amber/70">
-              ● SIMULATED — bunching, traffic, breakdown, demand, redistribution and impact figures
+            <li className="font-mono text-[9px] text-holo-teal/70">
+              ● PREDICTIVE — bunching, traffic, breakdown, demand, redistribution and impact figures
             </li>
-            <li className="font-mono text-[9px] text-alert-amber/70">
-              ● SIMULATED — AI confidence, recommendations, driver messages, acknowledgements, VoIP
+            <li className="font-mono text-[9px] text-holo-teal/70">
+              ● PREDICTIVE — confidence scores, recommendations, driver messages and call workflow
             </li>
           </ul>
           <p className="mt-2 border-t border-holo-glow/10 pt-2 font-mono text-[9px] text-holo-glow/45">
-            No real driver is contacted. No operational instruction is executed automatically.
-            Production deployment requires formal UPSRTC authorization and backend integration.
+            No driver is contacted. No operational instruction is executed automatically. Production
+            deployment requires formal UPSRTC authorization and backend integration.
           </p>
         </div>
       )}

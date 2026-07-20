@@ -30,7 +30,7 @@ describe('audit log operations', () => {
     expect(events[0]?.id).not.toBe(events[1]?.id);
   });
 
-  it('preserves the simulated flag', () => {
+  it('preserves the model-vs-live provenance flag', () => {
     let events: AuditEvent[] = [];
     events = appendAuditEvent(events, { type: 'bus-selected', summary: 'Live', simulated: false });
     events = appendAuditEvent(events, { type: 'message-sent', summary: 'Sim', simulated: true });
@@ -82,7 +82,7 @@ describe('audit log operations', () => {
     expect(readAuditLog()).toEqual([]);
   });
 
-  it('exports valid JSON carrying the simulation notice', () => {
+  it('exports valid JSON carrying the provenance notice', () => {
     const events = appendAuditEvent([], {
       type: 'message-sent',
       summary: 'Demo message',
@@ -90,13 +90,13 @@ describe('audit log operations', () => {
     });
 
     const parsed = JSON.parse(exportAuditJson(events));
-    expect(parsed.product).toBe('UPSRTC AI Operations Copilot');
+    expect(parsed.product).toBe('TitanX AI');
     expect(parsed.eventCount).toBe(1);
-    expect(parsed.notice).toMatch(/simulated/i);
+    expect(parsed.notice).toMatch(/model-driven/i);
     expect(parsed.events).toHaveLength(1);
   });
 
-  it('exports a readable summary with the live-vs-simulated notice', () => {
+  it('exports a readable summary with the provenance notice', () => {
     const events = appendAuditEvent([], {
       type: 'call-started',
       summary: 'Demo call',
@@ -104,9 +104,9 @@ describe('audit log operations', () => {
     });
 
     const summary = exportAuditSummary(events);
-    expect(summary).toMatch(/DEMONSTRATION SUMMARY/);
-    expect(summary).toMatch(/No real driver was contacted/);
-    expect(summary).toMatch(/Demo VoIP call started/);
+    expect(summary).toMatch(/SESSION SUMMARY/);
+    expect(summary).toMatch(/No driver was contacted/);
+    expect(summary).toMatch(/Voice call started/);
   });
 });
 

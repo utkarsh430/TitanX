@@ -37,7 +37,8 @@ Run through this five minutes before presenting.
 - [ ] Live bus count is in the thousands, not zero.
 - [ ] Click one bus — the detail drawer opens with coordinates.
 - [ ] The schedule section fills in (or says "no schedule assigned" — both fine).
-- [ ] Click **Demonstrate Bunching** — the scenario panel appears.
+- [ ] The Alert Centre shows five alerts; click one — the analysis panel opens.
+- [ ] Click **Fleet Distribution** in the command bar — the demand view opens.
 - [ ] Open **Audit**, click **Clear** to start with an empty trail.
 - [ ] Open **Scenario Lab**, click **Reset Demonstration**.
 - [ ] Browser at 100% zoom, full screen ready.
@@ -120,6 +121,8 @@ the same baseline figures.
   twice. It pre-empts the automation-risk objection.
 - **"We are honest about data quality."** The GOOD/DEGRADED/STALE filter shows
   operational maturity, not weakness.
+- **"Every alert is attached to a real bus."** Then add: "what we predict about
+  it is a projection." Saying both keeps you credible.
 - **"We only fetch the schedule for the bus you selected."** Signals respect
   for existing systems.
 - **"These are estimates, not results."** Say it before anyone asks. It buys
@@ -131,8 +134,15 @@ the same baseline figures.
 
 **"Is this actually connected to our system, or is it a mock-up?"**
 > The vehicle positions and schedules are live from the UPSRTC endpoints —
-> those are our own systems, and this is this minute's data. The predictive
-> layer is simulated, and every simulated element is labelled amber on screen.
+> those are our own systems, and this is this minute's data. Every alert is
+> attached to a real vehicle. What the copilot predicts about those vehicles is
+> model output, and those surfaces are marked PREDICTIVE.
+
+**"Are those alerts real? Is that bus actually broken down right now?"**
+> No. The vehicle, its depot, route and position are real and live. The
+> projected condition is model output — that is what the PREDICTIVE marker
+> means. Nothing on this screen is a confirmed operational event, and nothing
+> has been dispatched.
 
 **"So the AI doesn't actually work yet?"**
 > Correct, and that is deliberate. Building a bunching optimizer before we have
@@ -142,9 +152,9 @@ the same baseline figures.
 > what needs your input.
 
 **"Where do the impact numbers come from?"**
-> They are illustrative estimates for this conversation, drawn from published
-> outcomes in comparable transit systems. They are labelled as estimates. The
-> only way to get real numbers for UPSRTC is a controlled pilot.
+> They are modelled estimates for this conversation, drawn from published
+> outcomes in comparable transit systems, and labelled as estimates. The only
+> way to get real numbers for UPSRTC is a controlled pilot.
 
 **"Can it hold or divert a bus automatically?"**
 > No — and it should not. Every recommendation requires explicit dispatcher

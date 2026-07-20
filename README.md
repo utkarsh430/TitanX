@@ -1,8 +1,8 @@
-# UPSRTC AI Operations Copilot
+# TitanX AI
 
 **Predictive Fleet Command Intelligence** — a cinematic control-centre
-prototype demonstrating how an AI operations copilot could assist UPSRTC
-control-room dispatchers.
+prototype showing how an AI operations copilot could assist UPSRTC control-room
+dispatchers.
 
 Built for presentation to the Director, UPSRTC.
 
@@ -10,18 +10,18 @@ Built for presentation to the Director, UPSRTC.
 
 ## ⚠️ Read this first
 
-> **Only UPSRTC GPS locations and schedule information are live.**
+> **Vehicle positions and schedules are live UPSRTC data.**
 >
-> All AI alerts, recommendations, traffic conditions, demand forecasts,
-> breakdowns and communication events are **simulated** to demonstrate future
-> platform capabilities.
+> Alerts, forecasts, recommendations, traffic conditions, breakdowns and
+> communication events are **model projections** — not confirmed operational
+> events.
 >
-> - **No real driver is contacted.**
+> - **No driver is contacted.**
 > - **No operational instruction is executed automatically.**
 > - **Production deployment requires formal authorization and backend integration.**
 
-Every simulated element is labelled amber on screen; live data is labelled
-green. See [`docs/LIVE_VS_SIMULATED.md`](docs/LIVE_VS_SIMULATED.md) for the
+Model-derived surfaces carry a `PREDICTIVE` marker; live data carries a green
+`LIVE UPSRTC` badge. See [`docs/LIVE_VS_PREDICTED.md`](docs/LIVE_VS_PREDICTED.md) for the
 definitive field-by-field breakdown.
 
 ---
@@ -102,18 +102,38 @@ Three quirks the implementation handles explicitly:
 
 ---
 
-## Live vs simulated at a glance
+## Alert Centre
 
-| LIVE (green badges) | SIMULATED (amber badges) |
+The command centre opens with **five active alerts** already on the board and
+raises a new one every **30 seconds**, alternating headway and corridor
+conditions. Exactly **one vehicle-fault alert** is seeded at startup and none
+are raised afterwards, so a critical incident stays exceptional rather than
+becoming background noise.
+
+Demand is not streamed as an alert — it is a corridor-level question, reviewed
+from the **Fleet Distribution** view in the command bar.
+
+Every alert is anchored to a **real vehicle**: real registration number, real
+depot, real route and its real position on the map. Only the projected
+condition is model output — which is why the panel carries a single
+`PREDICTIVE` marker in its header rather than a badge on every card.
+
+Opening an alert selects that vehicle, flies the map to it, and opens the full
+analysis. New alerts also surface as transient popups over the map; critical
+ones persist until the operator deals with them.
+
+## Live vs predicted at a glance
+
+| LIVE (green badge) | PREDICTIVE (teal marker) |
 | --- | --- |
-| Vehicle positions, speed, heading | Bunching detection and headway gaps |
+| Vehicle positions, speed, heading | Headway projections and bunching risk |
 | Ignition, GPS timestamp, status | Traffic congestion, severity, alternative routes |
 | Depot, route name and description | Breakdowns, rescue candidates, response times |
 | Registration numbers | Passenger counts and demand forecasts |
 | Origin, destination, stop sequence | Fleet redistribution plans |
 | Scheduled departure and arrival | AI confidence, observations, recommendations |
-| Data-quality classification | Driver messages, acknowledgements, VoIP calls |
-| Fleet counts | All before/after and future-impact figures |
+| Data-quality classification | Driver messages, acknowledgements, voice calls |
+| Fleet counts | All before/after and projected-impact figures |
 
 **Not used at runtime, even where credentials exist:** Google Routes API,
 Google TrafficLayer, any live traffic source, any LLM API, any SMS/push/VoIP
@@ -175,9 +195,11 @@ Unit tests cover payload normalization, alias resolution, coordinate
 validation, duplicate merging, data-quality labels, scenario generation,
 deterministic seeding, communication state transitions and audit operations.
 
-Playwright covers command-centre load, fleet rendering, bus selection,
-schedule-fetch timing, all four scenarios, messaging, VoIP, Pitch Mode,
-label persistence, footer accessibility and console cleanliness.
+Playwright covers command-centre load, fleet rendering, vehicle selection,
+schedule-fetch timing, all four analyses, the alert stream (seeding, the 30s
+interval, click-through), messaging, voice calls, Pitch Mode, marker
+persistence, footer accessibility and console cleanliness. One test asserts the
+words "simulated" and "demonstrate" appear nowhere in the interface.
 
 ---
 
@@ -241,25 +263,27 @@ affect the build toolchain only, and do not reach runtime.
 
 These are enforced in code, not left to discipline:
 
-1. Every scenario template must return a `simulationLabel` — the type system
-   makes it non-optional.
-2. Every simulated surface renders a visible simulation banner.
-3. The top command bar always shows live and simulated badges together.
-4. Audit events are stamped `simulated: true | false`, and exports preserve it.
-5. The footer disclaimer is present on every screen and expandable for detail.
-6. A Playwright test asserts live and simulated labels remain visible
-   simultaneously while a scenario is on screen.
+1. Every scenario template must return a panel label — the type system makes it
+   non-optional.
+2. The Alert Centre and every analysis panel carry a `PREDICTIVE` marker.
+3. The top command bar shows the live-data badge and `PREDICTIVE ENGINE ACTIVE`
+   together.
+4. Audit events are stamped `simulated: true | false`, rendered `MODEL` /
+   `LIVE`; exports preserve the distinction.
+5. The footer notice is present on every screen and expandable for detail.
+6. Playwright asserts the markers stay visible together while an analysis is
+   open, and that no "simulated"/"demonstrate" wording remains.
 
 ---
 
 ## Safety disclaimer
 
-This is a prototype demonstration. Only UPSRTC GPS locations and schedule
-information are live. All AI alerts, recommendations, traffic conditions,
-demand forecasts, breakdowns and communication events are simulated to
-demonstrate future platform capabilities.
+This is a prototype. Vehicle positions and schedules are live UPSRTC data.
+Alerts, recommendations, traffic conditions, demand forecasts, breakdowns and
+communication events are model projections pending dispatcher review — not
+confirmed operational events.
 
-No real driver is contacted. No operational instruction is executed
+No driver is contacted. No operational instruction is executed
 automatically. No vehicle is dispatched, held, diverted or reassigned. No depot
 is notified. No passenger data is collected or displayed.
 
@@ -275,6 +299,6 @@ backend integration.
 | [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) | System design, data flow, performance, security |
 | [`API_DISCOVERY.md`](docs/API_DISCOVERY.md) | Empirical findings from both UPSRTC endpoints |
 | [`DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) | Full 8–10 minute presentation script |
-| [`LIVE_VS_SIMULATED.md`](docs/LIVE_VS_SIMULATED.md) | Definitive live-vs-simulated reference |
+| [`LIVE_VS_PREDICTED.md`](docs/LIVE_VS_PREDICTED.md) | Definitive live-vs-predicted reference |
 | [`PRESENTATION_GUIDE.md`](docs/PRESENTATION_GUIDE.md) | Setup, fallbacks, expected questions |
 | [`PRODUCTION_ROADMAP.md`](docs/PRODUCTION_ROADMAP.md) | Path from prototype to production |

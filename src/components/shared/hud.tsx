@@ -48,7 +48,7 @@ export function HudPanel({
   );
 }
 
-/** LIVE / SIMULATED / FIXTURE labelling badge. */
+/** LIVE / MODEL / FIXTURE provenance badge. */
 export function Badge({
   variant = 'sim',
   children,
@@ -226,7 +226,7 @@ export function ConfidenceRing({
       className="relative shrink-0"
       style={{ width: size, height: size }}
       role="img"
-      aria-label={`${label}: ${percent} percent (simulated)`}
+      aria-label={`${label}: ${percent} percent, projected`}
     >
       <svg width={size} height={size} className="-rotate-90">
         <circle

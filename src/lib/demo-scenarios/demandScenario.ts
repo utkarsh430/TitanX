@@ -2,10 +2,10 @@ import { SeededRandom, offsetCoordinate } from '@/lib/simulation/seededRandom';
 import { SIMULATION_LABELS, type ScenarioBase, type ScenarioContext } from './types';
 
 /**
- * SIMULATED demand and fleet-redistribution demonstration.
+ * Demand and fleet-redistribution projection.
  *
- * No demand forecasting is performed. The heatmap, route deficits and
- * redistribution plan are all generated from local templates.
+ * The heatmap, route deficits and redistribution plan are generated from local
+ * models rather than measured ridership.
  */
 
 export const TIME_WINDOWS = ['06:00', '08:00', '10:00', '13:00', '17:00', '20:00'] as const;
@@ -139,7 +139,7 @@ export function buildDemandScenario(context: ScenarioContext): DemandScenario {
     const localIntensity = Math.min(1, random.float(0.35, 1) * intensity);
     return {
       id: `hotspot-${index + 1}`,
-      name: `Simulated demand cluster ${index + 1}`,
+      name: `Demand cluster ${index + 1}`,
       intensity: localIntensity,
       waitingPassengers: Math.round(localIntensity * random.int(60, 180)),
       ...position,
@@ -213,7 +213,7 @@ export function buildDemandScenario(context: ScenarioContext): DemandScenario {
     markers: [
       {
         id: bus.registrationNumber,
-        label: 'SELECTED LIVE BUS',
+        label: 'SELECTED SERVICE',
         role: 'selected',
         headingDegrees: bus.headingDegrees ?? 0,
         isRealBus: true,

@@ -57,7 +57,7 @@ export const PITCH_STEPS: PitchStep[] = [
     id: 'bunching',
     caption: 'AI identifies the risk',
     detail:
-      'A simulated bunching projection shows two services converging on the same passenger stop.',
+      'A headway projection shows two services converging on the same passenger stop.',
     durationMs: 9000,
     action: { type: 'scenario', kind: 'bunching' },
   },
@@ -73,7 +73,7 @@ export const PITCH_STEPS: PitchStep[] = [
     id: 'message',
     caption: 'Real-time driver communication',
     detail:
-      'The approved instruction is prepared in English and Hindi for dispatcher review. No real driver is contacted.',
+      'The approved instruction is prepared in English and Hindi for dispatcher review. No driver is contacted.',
     durationMs: 8000,
     action: { type: 'message' },
   },
@@ -81,7 +81,7 @@ export const PITCH_STEPS: PitchStep[] = [
     id: 'traffic',
     caption: 'Congestion predicted before it is reached',
     detail:
-      'A simulated congestion corridor and an alternative route are compared side by side.',
+      'A projected congestion corridor and an alternative route are compared side by side.',
     durationMs: 9000,
     action: { type: 'scenario', kind: 'traffic' },
   },
@@ -89,7 +89,7 @@ export const PITCH_STEPS: PitchStep[] = [
     id: 'breakdown',
     caption: 'Rapid breakdown coordination',
     detail:
-      'A simulated critical fault triggers assistance ranking, response timing and depot notification.',
+      'A critical fault projection triggers assistance ranking, response timing and depot coordination.',
     durationMs: 9000,
     action: { type: 'scenario', kind: 'breakdown' },
   },
@@ -97,7 +97,7 @@ export const PITCH_STEPS: PitchStep[] = [
     id: 'demand',
     caption: 'Demand-led fleet distribution',
     detail:
-      'Simulated peak-hour demand exposes route deficits and a rebalancing plan across the corridor.',
+      'Projected peak-hour demand exposes route deficits and a rebalancing plan across the corridor.',
     durationMs: 9000,
     action: { type: 'scenario', kind: 'demand' },
   },
@@ -105,7 +105,7 @@ export const PITCH_STEPS: PitchStep[] = [
     id: 'voip',
     caption: 'Voice contact when it matters',
     detail:
-      'A simulated control-room call with structured speaking points and an automatic summary.',
+      'A control-room call with structured speaking points and an automatic summary.',
     durationMs: 8000,
     action: { type: 'call' },
   },
@@ -113,7 +113,7 @@ export const PITCH_STEPS: PitchStep[] = [
     id: 'impact',
     caption: 'The future of intelligent bus operations',
     detail:
-      'Illustrative future impact across bunching, waiting time, breakdown response and utilization.',
+      'Projected impact across bunching, waiting time, breakdown response and utilization.',
     durationMs: 11000,
     action: { type: 'impact' },
   },

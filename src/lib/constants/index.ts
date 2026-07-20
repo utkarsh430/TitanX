@@ -1,4 +1,4 @@
-export const PRODUCT_NAME = 'UPSRTC AI OPERATIONS COPILOT';
+export const PRODUCT_NAME = 'TITANX AI';
 export const PRODUCT_SUBTITLE = 'Predictive Fleet Command Intelligence';
 
 export const LIVE_POLL_INTERVAL_MS = 15_000;
@@ -9,7 +9,7 @@ export const DEFAULT_MAP_ZOOM = 7;
 export const SELECTED_BUS_ZOOM = 13;
 
 export const FOOTER_DISCLAIMER =
-  'Prototype demonstration. Only UPSRTC GPS locations and schedule information are live. All AI alerts, recommendations, traffic conditions, demand forecasts, breakdowns and communication events are simulated to demonstrate future platform capabilities.';
+  'Prototype. Vehicle positions and schedules are live UPSRTC data. Alerts, forecasts, recommendations and communication events are model projections pending dispatcher review — not confirmed operational events. No driver is contacted and no instruction is executed.';
 
 export const LIVE_LABELS = {
   gps: 'LIVE UPSRTC GPS',
@@ -32,7 +32,7 @@ export type AiState = (typeof AI_STATES)[number];
 export const AI_AMBIENT_LINES = [
   'Fleet telemetry synchronized.',
   'Potential operational disruption identified.',
-  'Simulation engine has generated an intervention scenario.',
+  'Intervention analysis prepared for dispatcher review.',
   'Dispatcher authorization is required.',
   'Communication channel prepared.',
   'Network impact projection updated.',

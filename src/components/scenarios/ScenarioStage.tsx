@@ -4,7 +4,6 @@ import { lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useCopilotStore } from '@/stores/copilotStore';
-import { SimulationBanner } from '@/components/shared/hud';
 import type { BunchingScenario } from '@/lib/demo-scenarios/bunchingScenario';
 import type { TrafficScenario } from '@/lib/demo-scenarios/trafficScenario';
 import type { BreakdownScenario } from '@/lib/demo-scenarios/breakdownScenario';
@@ -47,25 +46,25 @@ export function ScenarioStage() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 18 }}
           transition={{ type: 'spring', stiffness: 240, damping: 28 }}
-          className="hud-panel-strong hud-corners absolute right-3 top-3 z-40 flex max-h-[calc(100%-24px)] w-[520px] flex-col overflow-hidden"
+          className="hud-panel-strong hud-corners absolute right-3 top-3 z-40 flex max-h-[calc(100%-24px)] w-[470px] flex-col overflow-hidden"
           role="region"
-          aria-label={`${scenario.simulationLabel} details`}
+          aria-label={`${scenario.simulationLabel} for the selected service`}
           data-testid="scenario-stage"
         >
-          <SimulationBanner
-            label={scenario.simulationLabel}
-            variant={scenario.kind === 'breakdown' ? 'critical' : 'sim'}
-          />
-
-          <header className="flex shrink-0 items-center justify-between border-b border-holo-glow/15 px-4 py-2">
-            <h2 className="font-mono text-[11px] uppercase tracking-[0.16em] text-holo-glow">
-              Scenario Demonstration
-            </h2>
+          <header className="flex shrink-0 items-center justify-between border-b border-holo-glow/15 px-4 py-2.5">
+            <div className="flex items-center gap-2">
+              <h2 className="font-mono text-[11px] uppercase tracking-[0.16em] text-holo-glow">
+                {scenario.simulationLabel}
+              </h2>
+              <span className="rounded border border-holo-teal/40 bg-holo-teal/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.14em] text-holo-teal">
+                Predictive
+              </span>
+            </div>
             <button
               type="button"
               onClick={close}
               className="hud-button px-2 py-1"
-              aria-label="Close scenario demonstration"
+              aria-label="Close analysis"
               data-testid="close-scenario"
             >
               <X className="h-3.5 w-3.5" aria-hidden />

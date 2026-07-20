@@ -2,10 +2,10 @@ import { SeededRandom } from '@/lib/simulation/seededRandom';
 import { SIMULATION_LABELS, type ScenarioContext, type ScenarioKind } from './types';
 
 /**
- * SIMULATED driver-communication demonstration.
+ * Driver communication workflow.
  *
  * NO real driver is contacted. NO SMS, push or VoIP provider is integrated.
- * The acknowledgement and call audio are entirely local theatre.
+ * The acknowledgement and call audio are entirely local.
  */
 
 export type CommunicationState =
@@ -117,7 +117,7 @@ export function buildCommunicationScenario(
       expiresAt: expiry.toISOString(),
       approvalWarning:
         'This instruction requires authorized dispatcher approval before transmission. No operational instruction is executed automatically.',
-      demoBanner: 'DEMO MESSAGE — NO REAL DRIVER CONTACTED',
+      demoBanner: 'NO DRIVER IS CONTACTED FROM THIS PROTOTYPE',
     },
     call: {
       registrationNumber: bus.registrationNumber,
@@ -133,7 +133,7 @@ export function buildCommunicationScenario(
       acknowledgementDelaySeconds: overrides?.acknowledgementDelaySeconds ?? random.int(3, 7),
       callSummaryTemplate:
         'Control room contacted the assigned driver of {reg}. The approved instruction was relayed and acknowledged. Outcome monitoring remains active for this service.',
-      demoBanner: 'PROTOTYPE VOIP SIMULATION — NO EXTERNAL CALL PLACED',
+      demoBanner: 'NO EXTERNAL CALL IS PLACED FROM THIS PROTOTYPE',
     },
     seed: `communication:${bus.registrationNumber}`,
   };

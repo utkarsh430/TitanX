@@ -99,7 +99,7 @@
 
   /* Live vs simulated badges — the most important labelling affordance. */
   .badge-live {
-    @apply inline-flex items-center gap-1.5 rounded border border-alert-green/45 bg-alert-green/10
+    @apply inline-flex whitespace-nowrap items-center gap-1.5 rounded border border-alert-green/45 bg-alert-green/10
       px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-alert-green;
   }
 

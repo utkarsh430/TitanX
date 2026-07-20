@@ -49,7 +49,7 @@ test.describe('UPSRTC AI Operations Copilot', () => {
   test('1. command centre loads with identity and connection status', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page.getByRole('heading', { name: /UPSRTC AI OPERATIONS COPILOT/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /TITANX AI/i })).toBeVisible();
     await expect(page.getByText('Predictive Fleet Command Intelligence')).toBeVisible();
     await expect(page.getByText(/CONNECTED|FIXTURE|STALE CACHE|DEGRADED/).first()).toBeVisible();
   });
@@ -99,26 +99,26 @@ test.describe('UPSRTC AI Operations Copilot', () => {
     expect(scheduleRequests[0]).toContain('regNum=');
   });
 
-  test('5. bunching demonstration launches and is labelled simulated', async ({ page }) => {
+  test('5. headway analysis opens with projected companion services', async ({ page }) => {
     await page.goto('/');
     await selectFirstBus(page);
 
-    await page.getByTestId('demo-bunching').click();
+    await page.getByTestId('analysis-bunching').click();
 
     const stage = page.getByTestId('scenario-stage');
     await expect(stage).toBeVisible({ timeout: 20_000 });
     await expect(page.getByTestId('bunching-stage')).toBeVisible();
-    await expect(stage.getByText('SIMULATED BUNCHING DEMO').first()).toBeVisible();
-    await expect(stage.getByText('SELECTED LIVE BUS')).toBeVisible();
-    await expect(stage.getByText('SIMULATED SERVICE A')).toBeVisible();
-    await expect(stage.getByText('SIMULATED SERVICE C')).toBeVisible();
+    await expect(stage.getByText('HEADWAY ANALYSIS').first()).toBeVisible();
+    await expect(stage.getByText('SELECTED SERVICE')).toBeVisible();
+    await expect(stage.getByText('SERVICE AHEAD')).toBeVisible();
+    await expect(stage.getByText('SERVICE BEHIND')).toBeVisible();
   });
 
-  test('6. traffic demonstration launches with route comparison', async ({ page }) => {
+  test('6. corridor analysis opens with route comparison', async ({ page }) => {
     await page.goto('/');
     await selectFirstBus(page);
 
-    await page.getByTestId('demo-traffic').click();
+    await page.getByTestId('analysis-traffic').click();
 
     await expect(page.getByTestId('traffic-stage')).toBeVisible({ timeout: 20_000 });
     await expect(page.getByText('CURRENT ROUTE')).toBeVisible();
@@ -128,23 +128,23 @@ test.describe('UPSRTC AI Operations Copilot', () => {
     ).toBeVisible();
   });
 
-  test('7. breakdown demonstration launches with rescue candidates', async ({ page }) => {
+  test('7. incident response opens with assistance candidates', async ({ page }) => {
     await page.goto('/');
     await selectFirstBus(page);
 
-    await page.getByTestId('demo-breakdown').click();
+    await page.getByTestId('analysis-breakdown').click();
 
     await expect(page.getByTestId('breakdown-stage')).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByText('SIM-RESCUE-01').first()).toBeVisible();
+    await expect(page.getByText('RESCUE-01').first()).toBeVisible();
     await expect(page.getByText('Passengers onboard')).toBeVisible();
     await expect(page.getByText('Breakdown detected')).toBeVisible();
   });
 
-  test('8. demand demonstration launches with a working time slider', async ({ page }) => {
+  test('8. demand analysis opens with a working time slider', async ({ page }) => {
     await page.goto('/');
     await selectFirstBus(page);
 
-    await page.getByTestId('demo-demand').click();
+    await page.getByTestId('analysis-demand').click();
 
     await expect(page.getByTestId('demand-stage')).toBeVisible({ timeout: 20_000 });
     const slider = page.getByTestId('demand-time-slider');
@@ -158,15 +158,15 @@ test.describe('UPSRTC AI Operations Copilot', () => {
       .not.toBe(before);
   });
 
-  test('9. driver message simulation sends and receives acknowledgement', async ({ page }) => {
+  test('9. driver message sends and receives acknowledgement', async ({ page }) => {
     await page.goto('/');
     await selectFirstBus(page);
 
-    await page.getByTestId('demo-contact').click();
+    await page.getByTestId('analysis-contact').click();
 
     const modal = page.getByTestId('driver-message-modal');
     await expect(modal).toBeVisible({ timeout: 20_000 });
-    await expect(modal.getByText('DEMO MESSAGE — NO REAL DRIVER CONTACTED')).toBeVisible();
+    await expect(modal.getByText('NO DRIVER IS CONTACTED FROM THIS PROTOTYPE', { exact: true })).toBeVisible();
 
     // Bilingual draft is present.
     await expect(modal.getByText('English message')).toBeVisible();
@@ -180,18 +180,18 @@ test.describe('UPSRTC AI Operations Copilot', () => {
       .toMatch(/acknowledged/i);
   });
 
-  test('10. VoIP simulation connects and ends cleanly', async ({ page }) => {
+  test('10. voice call connects and ends cleanly', async ({ page }) => {
     await page.goto('/');
     await selectFirstBus(page);
 
-    await page.getByTestId('demo-bunching').click();
+    await page.getByTestId('analysis-bunching').click();
     await expect(page.getByTestId('scenario-stage')).toBeVisible();
 
     await page.getByTestId('copilot-action-voip').click();
 
     const overlay = page.getByTestId('voip-overlay');
     await expect(overlay).toBeVisible({ timeout: 20_000 });
-    await expect(overlay.getByText('PROTOTYPE VOIP SIMULATION — NO EXTERNAL CALL PLACED')).toBeVisible();
+    await expect(overlay.getByText('NO EXTERNAL CALL IS PLACED FROM THIS PROTOTYPE')).toBeVisible();
 
     await expect
       .poll(async () => page.getByTestId('call-status').innerText(), { timeout: 20_000 })
@@ -207,7 +207,7 @@ test.describe('UPSRTC AI Operations Copilot', () => {
     await page.goto('/');
     await waitForFleet(page);
 
-    await page.getByTestId('start-pitch-mode').click();
+    await page.getByTestId('start-pitch-mode-strip').click();
 
     const overlay = page.getByTestId('pitch-mode-overlay');
     await expect(overlay).toBeVisible({ timeout: 20_000 });
@@ -223,20 +223,20 @@ test.describe('UPSRTC AI Operations Copilot', () => {
     await expect(overlay).not.toBeVisible({ timeout: 15_000 });
   });
 
-  test('12. live and simulated labels remain visible together', async ({ page }) => {
+  test('12. live-data and predictive markers remain visible together', async ({ page }) => {
     await page.goto('/');
     await waitForFleet(page);
 
-    // The top bar always distinguishes live data from simulated capability.
+    // The top bar always distinguishes live data from the predictive layer.
     await expect(page.getByText(/LIVE UPSRTC GPS|UPSRTC FIXTURE FALLBACK/).first()).toBeVisible();
-    await expect(page.getByText('SIMULATED AI CAPABILITIES')).toBeVisible();
+    await expect(page.getByText('Predictive Engine Active')).toBeVisible();
 
     await selectFirstBus(page);
-    await page.getByTestId('demo-breakdown').click();
+    await page.getByTestId('analysis-breakdown').click();
     await expect(page.getByTestId('breakdown-stage')).toBeVisible({ timeout: 20_000 });
 
     // Simulation labelling survives while a scenario is on screen.
-    await expect(page.getByTestId('scenario-stage').getByText('SIMULATED BREAKDOWN DEMO').first()).toBeVisible();
+    await expect(page.getByTestId('scenario-stage').getByText('INCIDENT RESPONSE').first()).toBeVisible();
     await expect(page.getByText(/LIVE UPSRTC GPS|UPSRTC FIXTURE FALLBACK/).first()).toBeVisible();
   });
 
@@ -245,10 +245,10 @@ test.describe('UPSRTC AI Operations Copilot', () => {
 
     const footer = page.getByTestId('footer-disclaimer');
     await expect(footer).toBeVisible();
-    await expect(footer).toContainText(/Only UPSRTC GPS locations and schedule information are live/);
+    await expect(footer).toContainText(/Vehicle positions and schedules are live UPSRTC data/);
 
     await footer.getByRole('button').click();
-    await expect(footer).toContainText(/No real driver is contacted/);
+    await expect(footer).toContainText(/No driver is contacted/);
     await expect(footer).toContainText(/No operational instruction is executed automatically/);
   });
 
@@ -260,7 +260,7 @@ test.describe('UPSRTC AI Operations Copilot', () => {
     await page.goto('/');
     await selectFirstBus(page);
 
-    for (const testId of ['demo-bunching', 'demo-traffic', 'demo-breakdown', 'demo-demand']) {
+    for (const testId of ['analysis-bunching', 'analysis-traffic', 'analysis-breakdown', 'analysis-demand']) {
       await page.getByTestId(testId).click();
       await expect(page.getByTestId('scenario-stage')).toBeVisible({ timeout: 20_000 });
       await page.waitForTimeout(700);
@@ -292,7 +292,7 @@ test.describe('UPSRTC AI Operations Copilot', () => {
     await expect(page.getByTestId('audit-drawer')).toBeVisible();
   });
 
-  test('16. impact dashboard shows illustrative future figures', async ({ page }) => {
+  test('16. impact dashboard shows projected figures', async ({ page }) => {
     await page.goto('/');
     await waitForFleet(page);
 
@@ -300,8 +300,8 @@ test.describe('UPSRTC AI Operations Copilot', () => {
 
     const dashboard = page.getByTestId('impact-dashboard');
     await expect(dashboard).toBeVisible({ timeout: 15_000 });
-    await expect(dashboard.getByText('ILLUSTRATIVE FUTURE IMPACT')).toBeVisible();
-    await expect(dashboard.getByText(/Demonstration estimates only/)).toBeVisible();
+    await expect(dashboard.getByText('PROJECTED', { exact: true })).toBeVisible();
+    await expect(dashboard.getByText(/Modelled estimates/)).toBeVisible();
     await expect(dashboard.getByText('Bunching incidents', { exact: true })).toBeVisible();
 
     await page.keyboard.press('Escape');
@@ -311,7 +311,7 @@ test.describe('UPSRTC AI Operations Copilot', () => {
   test('17. audit trail records the operator walkthrough', async ({ page }) => {
     await page.goto('/');
     await selectFirstBus(page);
-    await page.getByTestId('demo-bunching').click();
+    await page.getByTestId('analysis-bunching').click();
     await expect(page.getByTestId('scenario-stage')).toBeVisible({ timeout: 20_000 });
 
     await page.getByRole('button', { name: /Audit/i }).click();
@@ -322,10 +322,139 @@ test.describe('UPSRTC AI Operations Copilot', () => {
     await expect(drawer.getByText('Scenario launched').first()).toBeVisible();
     // Live vs simulated provenance is preserved per event.
     await expect(drawer.getByText('LIVE').first()).toBeVisible();
-    await expect(drawer.getByText('SIM').first()).toBeVisible();
+    await expect(drawer.getByText('MODEL').first()).toBeVisible();
   });
 
-  test('18. keyboard escape closes the bus detail drawer', async ({ page }) => {
+  test('18. alert centre is seeded with five alerts anchored to real vehicles', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('alert-centre')).toBeVisible();
+
+    const alerts = page.getByTestId('alert-item');
+    await expect(alerts.first()).toBeVisible({ timeout: 60_000 });
+    await expect.poll(() => alerts.count(), { timeout: 30_000 }).toBe(5);
+
+    // Provenance marker is present, and exactly once — not on every card.
+    await expect(page.getByTestId('alert-centre').getByText('Predictive', { exact: true })).toBeVisible();
+
+    // Each alert carries a real UPSRTC registration.
+    await expect(alerts.first()).toContainText(/[A-Z]{2}\d{1,2}[A-Z]{0,3}\d{1,4}/);
+
+    // No toast on load — the seeded batch populates the board silently.
+    await expect(page.getByTestId('alert-toast')).toHaveCount(0);
+  });
+
+  test('19. opening an alert selects its vehicle and opens the analysis', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('alert-item').first()).toBeVisible({ timeout: 60_000 });
+
+    const registration = (await page.getByTestId('alert-item').first().innerText()).match(
+      /[A-Z]{2}\d{1,2}[A-Z]{0,3}\d{1,4}/,
+    )?.[0];
+    expect(registration).toBeTruthy();
+
+    await page.getByTestId('alert-item').first().click();
+
+    await expect(page.getByTestId('bus-detail-drawer')).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByTestId('bus-detail-drawer')).toContainText(registration as string);
+    await expect(page.getByTestId('scenario-stage')).toBeVisible({ timeout: 20_000 });
+  });
+
+  test('20. a new alert is raised on the stream interval', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('alert-item').first()).toBeVisible({ timeout: 60_000 });
+    const initial = await page.getByTestId('alert-item').count();
+
+    // The stream raises one alert every 30s; allow headroom.
+    await expect(page.getByTestId('alert-toast').first()).toBeVisible({ timeout: 50_000 });
+    await expect.poll(() => page.getByTestId('alert-item').count(), { timeout: 20_000 }).toBeGreaterThan(initial);
+  });
+
+  test('21. no "simulated" or "demonstrate" wording remains anywhere in the interface', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('alert-item').first()).toBeVisible({ timeout: 60_000 });
+
+    async function assertClean(where: string) {
+      const body = await page.locator('body').innerText();
+      expect(body, `"simulated" leaked into: ${where}`).not.toMatch(/simulated/i);
+      expect(body, `"demonstrate" leaked into: ${where}`).not.toMatch(/demonstrate/i);
+    }
+
+    await assertClean('command centre');
+
+    await page.getByTestId('fleet-bus-row').first().click();
+    await expect(page.getByTestId('bus-detail-drawer')).toBeVisible();
+    await assertClean('vehicle drawer');
+
+    // Every analysis view, not just the first — this is where wording regressed before.
+    for (const testId of [
+      'analysis-bunching',
+      'analysis-traffic',
+      'analysis-breakdown',
+      'analysis-demand',
+    ]) {
+      await page.getByTestId(testId).click();
+      await expect(page.getByTestId('scenario-stage')).toBeVisible({ timeout: 20_000 });
+      await page.waitForTimeout(400);
+      await assertClean(testId);
+    }
+
+    // And every auxiliary surface.
+    await page.getByRole('button', { name: /Scenario Lab/i }).click();
+    await expect(page.getByTestId('scenario-lab')).toBeVisible();
+    await assertClean('scenario lab');
+    await page.keyboard.press('Escape');
+
+    await page.getByRole('button', { name: /Diagnostics/i }).click();
+    await expect(page.getByTestId('diagnostics-drawer')).toBeVisible();
+    await assertClean('diagnostics');
+    await page.keyboard.press('Escape');
+
+    await page.getByRole('button', { name: /Audit/i }).click();
+    await expect(page.getByTestId('audit-drawer')).toBeVisible();
+    await assertClean('audit trail');
+    await page.keyboard.press('Escape');
+
+    await page.getByTestId('open-impact').click();
+    await expect(page.getByTestId('impact-dashboard')).toBeVisible();
+    await assertClean('impact dashboard');
+  });
+
+  test('22. fleet distribution opens from the command bar without a prior selection', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('alert-item').first()).toBeVisible({ timeout: 60_000 });
+
+    // No vehicle selected yet — the view must anchor one itself.
+    await expect(page.getByTestId('bus-detail-drawer')).toHaveCount(0);
+
+    await page.getByTestId('open-fleet-distribution').click();
+
+    await expect(page.getByTestId('demand-stage')).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByTestId('demand-time-slider')).toBeVisible();
+    await expect(page.getByTestId('demand-stage').getByText('Redistribution plan')).toBeVisible();
+  });
+
+  test('23. alert stream carries exactly one vehicle-fault alert', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('alert-item').first()).toBeVisible({ timeout: 60_000 });
+    await expect.poll(() => page.getByTestId('alert-item').count(), { timeout: 30_000 }).toBe(5);
+
+    // Count by kind attribute — titles and summaries share wording, so prose
+    // matching double-counts.
+    const kinds = await page
+      .getByTestId('alert-item')
+      .evaluateAll((nodes) => nodes.map((n) => n.getAttribute('data-alert-kind')));
+
+    expect(kinds.filter((k) => k === 'breakdown')).toHaveLength(1);
+    expect(kinds.filter((k) => k === 'bunching' || k === 'traffic')).toHaveLength(4);
+    // Demand is reviewed from Fleet Distribution, never streamed as an alert.
+    expect(kinds).not.toContain('demand');
+  });
+
+  test('24. keyboard escape closes the bus detail drawer', async ({ page }) => {
     await page.goto('/');
     await selectFirstBus(page);
 

@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect } from 'react';
 import { X, TrendingDown, TrendingUp, Info } from 'lucide-react';
 import { useCopilotStore } from '@/stores/copilotStore';
-import { Badge, CountUp } from '@/components/shared/hud';
+import { CountUp } from '@/components/shared/hud';
 import {
   FUTURE_IMPACT_KPIS,
   IMPACT_DISCLAIMER,
@@ -13,7 +13,7 @@ import {
 } from '@/lib/demo-scenarios/impactScenario';
 import { cn } from '@/lib/utils';
 
-/** ILLUSTRATIVE FUTURE IMPACT — demonstration estimates, not measured results. */
+/** Projected operational impact — modelled estimates, not measured results. */
 export function ImpactDashboard() {
   const isOpen = useCopilotStore((state) => state.isImpactOpen);
   const toggleImpact = useCopilotStore((state) => state.toggleImpact);
@@ -51,15 +51,15 @@ export function ImpactDashboard() {
             <header className="flex items-center justify-between border-b border-holo-glow/20 px-6 py-4">
               <div>
                 <div className="mb-1.5 flex items-center gap-2">
-                  <Badge variant="sim" pulse>
+                  <span className="rounded border border-holo-teal/45 bg-holo-teal/10 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-holo-teal">
                     {IMPACT_LABEL}
-                  </Badge>
+                  </span>
                 </div>
                 <h2 className="text-lg font-bold tracking-[0.1em] text-holo-glow text-glow">
                   Projected Operational Impact
                 </h2>
                 <p className="font-mono text-[10px] text-holo-glow/45">
-                  UPSRTC AI Operations Copilot — future capability projection
+                  TitanX AI — projected operational outcomes
                 </p>
               </div>
 
@@ -159,9 +159,9 @@ export function ImpactDashboard() {
               </div>
             </div>
 
-            <footer className="flex items-start gap-2 border-t border-alert-amber/25 bg-alert-amber/[0.06] px-6 py-3">
-              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-alert-amber" aria-hidden />
-              <p className="font-mono text-[10px] leading-relaxed text-alert-amber/85">
+            <footer className="flex items-start gap-2 border-t border-holo-glow/15 bg-void-900/60 px-6 py-3">
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-holo-teal" aria-hidden />
+              <p className="font-mono text-[10px] leading-relaxed text-holo-glow/65">
                 {IMPACT_DISCLAIMER}
               </p>
             </footer>

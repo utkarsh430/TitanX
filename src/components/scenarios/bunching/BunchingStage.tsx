@@ -3,11 +3,11 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { ArrowRight, GitMerge } from 'lucide-react';
-import { Badge, CountUp } from '@/components/shared/hud';
+import { CountUp } from '@/components/shared/hud';
 import type { BunchingScenario } from '@/lib/demo-scenarios/bunchingScenario';
 import { cn } from '@/lib/utils';
 
-/** SIMULATED bunching visualisation — headway geometry and projected recovery. */
+/** Bunching visualisation — headway geometry and projected recovery. */
 export function BunchingStage({ scenario }: { scenario: BunchingScenario }) {
   const [accepted, setAccepted] = useState(false);
 
@@ -21,9 +21,9 @@ export function BunchingStage({ scenario }: { scenario: BunchingScenario }) {
           <GitMerge className="h-3.5 w-3.5" aria-hidden />
           Headway Analysis
         </h3>
-        <Badge variant="sim" pulse>
-          FUTURE BUNCHING-OPTIMIZATION DEMONSTRATION
-        </Badge>
+<span className="rounded border border-holo-teal/40 bg-holo-teal/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.14em] text-holo-teal">
+          Predictive
+        </span>
       </div>
 
       {/* Corridor geometry */}
@@ -31,11 +31,11 @@ export function BunchingStage({ scenario }: { scenario: BunchingScenario }) {
         <div className="absolute inset-x-6 top-1/2 h-[2px] -translate-y-1/2 bg-gradient-to-r from-holo-glow/10 via-holo-glow/45 to-holo-glow/10" />
 
         <div className="relative flex items-center justify-between">
-          <ServiceNode label="SIMULATED SERVICE A" sublabel="Ahead" tone="amber" />
+          <ServiceNode label="SERVICE AHEAD" sublabel="Preceding service" tone="amber" />
           <GapIndicator minutes={gapAhead} label="Gap ahead" critical={gapAhead < 6} />
-          <ServiceNode label="SELECTED LIVE BUS" sublabel="Real UPSRTC vehicle" tone="live" pulse />
+          <ServiceNode label="SELECTED SERVICE" sublabel="Live UPSRTC vehicle" tone="live" pulse />
           <GapIndicator minutes={gapBehind} label="Gap behind" critical={false} wide />
-          <ServiceNode label="SIMULATED SERVICE C" sublabel="Behind" tone="amber" />
+          <ServiceNode label="SERVICE BEHIND" sublabel="Following service" tone="amber" />
         </div>
       </div>
 

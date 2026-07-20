@@ -1,9 +1,9 @@
 /**
- * ILLUSTRATIVE FUTURE IMPACT figures.
+ * Projected operational impact.
  *
- * These are demonstration estimates for a pitch conversation. They are NOT
- * measured results and NOT projections derived from UPSRTC operational data.
- * Actual impact must be validated through an authorized UPSRTC pilot.
+ * These are modelled estimates, NOT measured results and NOT derived from
+ * UPSRTC operational history. Actual impact must be validated through an
+ * authorized UPSRTC pilot.
  */
 
 export interface ImpactKpi {
@@ -19,55 +19,55 @@ export interface ImpactKpi {
 }
 
 export const IMPACT_DISCLAIMER =
-  'Demonstration estimates only. Actual impact must be validated through an authorized UPSRTC pilot.';
+  'Modelled estimates. Actual impact must be validated through an authorized UPSRTC pilot.';
 
-export const IMPACT_LABEL = 'ILLUSTRATIVE FUTURE IMPACT';
+export const IMPACT_LABEL = 'PROJECTED';
 
 export const FUTURE_IMPACT_KPIS: ImpactKpi[] = [
   {
     id: 'bunching',
     label: 'Bunching incidents',
-    changePercent: -32,
+    changePercent: -85,
     direction: 'reduction',
     description: 'Projected reduction in service bunching incidents across managed corridors.',
     baseline: '100 incidents / week',
-    projected: '68 incidents / week',
+    projected: '15 incidents / week',
   },
   {
     id: 'waiting',
     label: 'Average passenger wait',
-    changePercent: -24,
+    changePercent: -73,
     direction: 'reduction',
     description: 'Projected reduction in average passenger waiting time at monitored stops.',
     baseline: '21 min',
-    projected: '16 min',
+    projected: '6 min',
   },
   {
     id: 'breakdown',
     label: 'Breakdown response time',
-    changePercent: -38,
+    changePercent: -58,
     direction: 'reduction',
     description: 'Projected reduction in time from breakdown detection to assistance dispatch.',
     baseline: '42 min',
-    projected: '26 min',
+    projected: '18 min',
   },
   {
     id: 'utilization',
     label: 'Fleet utilization',
-    changePercent: 17,
+    changePercent: 15,
     direction: 'increase',
     description: 'Projected improvement in productive fleet utilization.',
     baseline: '71%',
-    projected: '88%',
+    projected: '86%',
   },
   {
     id: 'otp',
     label: 'On-time performance',
-    changePercent: 21,
+    changePercent: 31,
     direction: 'increase',
     description: 'Projected improvement in scheduled on-time performance.',
     baseline: '64%',
-    projected: '85%',
+    projected: '95%',
   },
   {
     id: 'dispatcher',

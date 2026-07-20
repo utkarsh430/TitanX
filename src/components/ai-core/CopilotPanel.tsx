@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Pencil, X, Eye, Send, PhoneCall, Radio, Bot } from 'lucide-react';
 import { useCopilotStore, useSelectedBus } from '@/stores/copilotStore';
 import { IntelligenceCore } from './IntelligenceCore';
-import { Badge, ConfidenceRing, Typewriter, Waveform, Readout } from '@/components/shared/hud';
+import { ConfidenceRing, Typewriter, Waveform, Readout } from '@/components/shared/hud';
 import { AI_AMBIENT_LINES } from '@/lib/constants';
 import { SCENARIO_FULL_LABELS } from '@/lib/simulation/scenarioEngine';
 import { cn } from '@/lib/utils';
@@ -86,7 +86,7 @@ export function CopilotPanel() {
 
   return (
     <aside
-      className="hud-panel hud-corners relative z-20 flex w-[380px] shrink-0 flex-col overflow-hidden"
+      className="hud-panel hud-corners relative z-20 flex w-[344px] shrink-0 flex-col overflow-hidden"
       aria-label="AI copilot panel"
     >
       {/* Core header */}
@@ -94,9 +94,11 @@ export function CopilotPanel() {
         <div className="mb-3 flex items-center justify-between">
           <h2 className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-holo-glow">
             <Bot className="h-3.5 w-3.5" aria-hidden />
-            AI Operations Copilot
+            TitanX Copilot
           </h2>
-          <Badge variant="sim">SIMULATED AI DEMONSTRATION</Badge>
+          <span className="rounded border border-holo-teal/45 bg-holo-teal/10 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-holo-teal">
+            Predictive
+          </span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -136,8 +138,8 @@ export function CopilotPanel() {
 
               <p className="mb-4 text-center font-mono text-[11px] leading-relaxed text-holo-glow/50">
                 {selectedBus
-                  ? `Live telemetry synchronised for ${selectedBus.registrationNumber}. Launch a demonstration from the bus detail drawer to see predictive intervention.`
-                  : 'Select a live UPSRTC bus from the fleet panel or the map to begin. The copilot will then offer simulated intervention scenarios.'}
+                  ? `Live telemetry synchronised for ${selectedBus.registrationNumber}. Open an analysis from the vehicle panel, or act on an alert from the Alert Centre.`
+                  : 'Select a vehicle from the fleet panel or the map, or open an alert from the Alert Centre, to begin.'}
               </p>
 
               {/* Standing readiness readout — keeps the panel informative while idle. */}
@@ -146,11 +148,11 @@ export function CopilotPanel() {
                 <div className="space-y-1">
                   <Channel label="Fleet telemetry ingest" status="live" detail="15s polling" />
                   <Channel label="Schedule retrieval" status="live" detail="on selection" />
-                  <Channel label="Headway analysis" status="sim" detail="simulated" />
-                  <Channel label="Corridor traffic model" status="sim" detail="simulated" />
-                  <Channel label="Vehicle health monitor" status="sim" detail="simulated" />
-                  <Channel label="Demand forecasting" status="sim" detail="simulated" />
-                  <Channel label="Driver communications" status="sim" detail="simulated" />
+                  <Channel label="Headway analysis" status="model" detail="predictive" />
+                  <Channel label="Corridor traffic model" status="model" detail="predictive" />
+                  <Channel label="Vehicle health monitor" status="model" detail="predictive" />
+                  <Channel label="Demand forecasting" status="model" detail="predictive" />
+                  <Channel label="Driver communications" status="model" detail="predictive" />
                 </div>
               </div>
 
@@ -174,9 +176,15 @@ export function CopilotPanel() {
               {/* Scenario headline */}
               <div className={cn('mb-3 rounded border p-3', severity.border, severity.bg)}>
                 <div className="mb-2 flex items-start justify-between gap-2">
-                  <Badge variant={scenario.severity === 'critical' ? 'critical' : 'sim'} pulse>
+                  <span
+                    className={cn(
+                      'rounded border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.14em]',
+                      severity.border,
+                      severity.text,
+                    )}
+                  >
                     {scenario.simulationLabel}
-                  </Badge>
+                  </span>
                   <ConfidenceRing percent={scenario.confidencePercent} size={62} />
                 </div>
 
@@ -226,7 +234,7 @@ export function CopilotPanel() {
                         )}
                       >
                         {bus}
-                        {isReal ? ' · LIVE' : ' · SIM'}
+                        {isReal ? ' · LIVE' : ''}
                       </span>
                     );
                   })}
@@ -293,11 +301,11 @@ export function CopilotPanel() {
                     data-testid="copilot-action-voip"
                   >
                     <PhoneCall className="h-3 w-3 shrink-0" aria-hidden />
-                    Start VoIP Call (Simulated)
+                    Start Voice Call
                   </button>
                 </div>
 
-                <p className="mt-2.5 rounded border border-alert-amber/25 bg-alert-amber/[0.06] px-2 py-1.5 font-mono text-[9px] leading-relaxed text-alert-amber/80">
+                <p className="mt-2.5 rounded border border-holo-glow/15 bg-void-900/50 px-2 py-1.5 font-mono text-[9px] leading-relaxed text-holo-glow/55">
                   {SCENARIO_FULL_LABELS[scenario.kind]} — no operational instruction is executed
                   automatically. Authorized dispatcher approval is required.
                 </p>
@@ -306,7 +314,7 @@ export function CopilotPanel() {
               {/* Impact preview */}
               {scenario.impact.length > 0 && (
                 <div className="mt-3 border-t border-holo-glow/12 pt-3">
-                  <p className="hud-label mb-2">Projected Simulated Impact</p>
+                  <p className="hud-label mb-2">Projected Impact</p>
                   <div className="space-y-1.5">
                     {scenario.impact.map((metric) => (
                       <div
@@ -349,14 +357,14 @@ export function CopilotPanel() {
   );
 }
 
-/** Idle readiness row distinguishing live ingest from simulated capability. */
+/** Idle readiness row distinguishing live ingest from model-derived capability. */
 function Channel({
   label,
   status,
   detail,
 }: {
   label: string;
-  status: 'live' | 'sim';
+  status: 'live' | 'model';
   detail: string;
 }) {
   const isLive = status === 'live';

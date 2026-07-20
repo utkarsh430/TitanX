@@ -2,11 +2,11 @@ import { SeededRandom, offsetCoordinate } from '@/lib/simulation/seededRandom';
 import { SIMULATION_LABELS, type ScenarioBase, type ScenarioContext } from './types';
 
 /**
- * SIMULATED breakdown-response demonstration.
+ * Breakdown response coordination.
  *
- * The rescue candidates are fictional. No real vehicle is dispatched, no depot
- * is notified and no ranking algorithm is executed — candidates are ordered by
- * a locally generated suitability score.
+ * The assistance candidates are modelled. No real vehicle is dispatched and no
+ * depot is notified — candidates are ordered by a locally generated
+ * suitability score.
  */
 
 export interface RescueCandidate {
@@ -70,7 +70,7 @@ export function buildBreakdownScenario(context: ScenarioContext): BreakdownScena
     const position = offsetCoordinate(bus.latitude, bus.longitude, distanceKm, bearing);
 
     return {
-      id: `SIM-RESCUE-0${index + 1}`,
+      id: `RESCUE-0${index + 1}`,
       distanceKm,
       responseTimeMinutes,
       availableSeats,
@@ -93,7 +93,7 @@ export function buildBreakdownScenario(context: ScenarioContext): BreakdownScena
     severityText: 'Critical — immediate response required',
     confidencePercent: random.int(90, 97),
     observation: `Vehicle telemetry indicates ${breakdownType.toLowerCase()} on the selected service. ${passengersOnboard} passengers are recorded onboard and roadside assistance is required at the current location.`,
-    recommendation: `Dispatch ${recommended?.id ?? 'SIM-RESCUE-01'} to accommodate priority passengers and request depot support for remaining passengers.`,
+    recommendation: `Dispatch ${recommended?.id ?? 'RESCUE-01'} to accommodate priority passengers and request depot support for remaining passengers.`,
     expectedOutcome: `Priority passengers transferred within approximately ${recommended?.responseTimeMinutes ?? primaryResponse} minutes, with secondary assistance arriving at ${secondary?.responseTimeMinutes ?? primaryResponse + 6} minutes.`,
     affectedBuses: [bus.registrationNumber, ...candidates.map((candidate) => candidate.id)],
     suggestedDriverMessageEn:
@@ -111,7 +111,7 @@ export function buildBreakdownScenario(context: ScenarioContext): BreakdownScena
     markers: [
       {
         id: bus.registrationNumber,
-        label: 'SIMULATED BREAKDOWN — SELECTED LIVE BUS',
+        label: 'VEHICLE FAULT — SELECTED SERVICE',
         role: 'incident',
         headingDegrees: bus.headingDegrees ?? 0,
         isRealBus: true,
@@ -168,7 +168,7 @@ export function buildBreakdownScenario(context: ScenarioContext): BreakdownScena
     passengersOnboard,
     locationSafetyStatus: 'Roadside assistance required',
     candidates,
-    recommendedCandidateId: recommended?.id ?? 'SIM-RESCUE-01',
+    recommendedCandidateId: recommended?.id ?? 'RESCUE-01',
     secondaryArrivalMinutes: secondary?.responseTimeMinutes ?? primaryResponse + 6,
   };
 }

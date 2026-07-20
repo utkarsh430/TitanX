@@ -41,7 +41,7 @@ export function AuditDrawer() {
           transition={{ type: 'spring', stiffness: 260, damping: 30 }}
           className="hud-panel-strong hud-corners fixed left-0 top-0 z-[95] flex h-full w-[420px] flex-col overflow-hidden"
           role="dialog"
-          aria-label="Demonstration audit trail"
+          aria-label="Session audit trail"
           data-testid="audit-drawer"
         >
           <header className="flex shrink-0 items-center justify-between border-b border-holo-glow/20 px-4 py-3">
@@ -109,8 +109,7 @@ export function AuditDrawer() {
           <div className="min-h-0 flex-1 overflow-y-auto">
             {events.length === 0 && (
               <p className="px-4 py-8 text-center font-mono text-[11px] text-holo-glow/40">
-                No demonstration events recorded yet. Select a bus and launch a scenario to begin the
-                audit trail.
+                No events recorded yet. Select a vehicle or open an alert to begin the audit trail.
               </p>
             )}
 
@@ -128,7 +127,7 @@ export function AuditDrawer() {
                       {AUDIT_EVENT_LABELS[event.type]}
                     </span>
                     <Badge variant={event.simulated ? 'sim' : 'live'}>
-                      {event.simulated ? 'SIM' : 'LIVE'}
+                      {event.simulated ? 'MODEL' : 'LIVE'}
                     </Badge>
                   </div>
 

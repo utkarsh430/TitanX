@@ -54,8 +54,8 @@ export function MapFallback({
               Reinitialise Map
             </button>
             <p className="mt-4 border-t border-holo-glow/10 pt-3 font-mono text-[10px] text-holo-glow/40">
-              Fleet data, schedules and all simulated demonstrations remain fully operational
-              without the basemap.
+              Fleet data, schedules and all analysis views remain fully operational without
+              the basemap.
             </p>
           </>
         )}

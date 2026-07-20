@@ -4,13 +4,12 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect } from 'react';
 import { X, RotateCcw, FlaskConical } from 'lucide-react';
 import { useCopilotStore, useSelectedBus } from '@/stores/copilotStore';
-import { Badge } from '@/components/shared/hud';
 import { buildScenario } from '@/lib/simulation/scenarioEngine';
 import { TIME_WINDOWS, TIME_WINDOW_LABELS } from '@/lib/demo-scenarios/demandScenario';
 import { cn } from '@/lib/utils';
 
 /**
- * Presenter control surface for tuning the SIMULATED scenario values live.
+ * Presenter control surface for tuning projection inputs live.
  * Changing a control rebuilds the active scenario immediately.
  */
 export function ScenarioLab() {
@@ -69,7 +68,7 @@ export function ScenarioLab() {
                 Scenario Lab
               </h2>
               <p className="font-mono text-[9px] text-holo-glow/40">
-                Presenter controls for simulated values
+                Presenter controls for projection inputs
               </p>
             </div>
             <button
@@ -84,9 +83,9 @@ export function ScenarioLab() {
 
           <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
             <div className="flex items-center gap-2">
-              <Badge variant="sim" pulse>
-                SIMULATED AI DEMONSTRATION
-              </Badge>
+              <span className="rounded border border-holo-teal/45 bg-holo-teal/10 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-holo-teal">
+                Predictive
+              </span>
               {!bus && (
                 <span className="font-mono text-[9px] text-alert-amber">Select a bus first</span>
               )}

@@ -2,11 +2,11 @@
 
 import { motion } from 'framer-motion';
 import { Wrench, Users, MapPinned, TriangleAlert } from 'lucide-react';
-import { Badge, CountUp } from '@/components/shared/hud';
+import { CountUp } from '@/components/shared/hud';
 import type { BreakdownScenario } from '@/lib/demo-scenarios/breakdownScenario';
 import { cn } from '@/lib/utils';
 
-/** SIMULATED breakdown response — no vehicle is dispatched, no depot notified. */
+/** Breakdown response — no vehicle is dispatched, no depot is notified. */
 export function BreakdownStage({ scenario }: { scenario: BreakdownScenario }) {
   return (
     <div className="space-y-3" data-testid="breakdown-stage">
@@ -15,9 +15,9 @@ export function BreakdownStage({ scenario }: { scenario: BreakdownScenario }) {
           <Wrench className="h-3.5 w-3.5" aria-hidden />
           Critical Incident Response
         </h3>
-        <Badge variant="critical" pulse>
-          SIMULATED BREAKDOWN-RESPONSE DEMONSTRATION
-        </Badge>
+<span className="rounded border border-holo-teal/40 bg-holo-teal/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.14em] text-holo-teal">
+          Predictive
+        </span>
       </div>
 
       {/* Alert banner */}
@@ -64,7 +64,7 @@ export function BreakdownStage({ scenario }: { scenario: BreakdownScenario }) {
 
       {/* Rescue candidates */}
       <div>
-        <span className="hud-label mb-2 block">Simulated assistance candidates</span>
+        <span className="hud-label mb-2 block">Assistance candidates</span>
         <div className="space-y-2">
           {scenario.candidates.map((candidate, index) => {
             const recommended = candidate.id === scenario.recommendedCandidateId;
@@ -130,7 +130,7 @@ export function BreakdownStage({ scenario }: { scenario: BreakdownScenario }) {
 
       {/* Response timeline */}
       <div className="rounded border border-holo-glow/15 bg-void-900/50 p-3">
-        <span className="hud-label mb-2 block">Simulated response timeline</span>
+        <span className="hud-label mb-2 block">Projected response timeline</span>
         <ol className="relative space-y-2 pl-4">
           <span
             aria-hidden
@@ -157,9 +157,9 @@ export function BreakdownStage({ scenario }: { scenario: BreakdownScenario }) {
         </ol>
       </div>
 
-      <p className="rounded border border-alert-crimson/25 bg-alert-crimson/[0.06] px-3 py-2 font-mono text-[9px] leading-relaxed text-alert-crimson/75">
-        All assistance vehicles, passenger counts and response times shown here are simulated. No
-        rescue vehicle has been dispatched and no depot has been notified.
+      <p className="rounded border border-holo-glow/15 bg-void-900/50 px-3 py-2 font-mono text-[9px] leading-relaxed text-holo-glow/55">
+        No assistance vehicle has been dispatched and no depot has been notified. Response requires
+        dispatcher approval.
       </p>
     </div>
   );

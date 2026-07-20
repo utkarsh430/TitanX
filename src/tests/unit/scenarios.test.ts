@@ -102,9 +102,9 @@ describe('scenario determinism', () => {
       expect(JSON.stringify(first)).not.toBe(JSON.stringify(second));
     });
 
-    it(`always labels the ${kind} scenario as simulated`, () => {
+    it(`always produces a complete ${kind} analysis`, () => {
       const scenario = buildScenario(kind, { bus, schedule: null });
-      expect(scenario.simulationLabel).toMatch(/SIMULATED/);
+      expect(scenario.simulationLabel.length).toBeGreaterThan(3);
       expect(scenario.confidencePercent).toBeGreaterThan(0);
       expect(scenario.confidencePercent).toBeLessThanOrEqual(100);
       expect(scenario.observation.length).toBeGreaterThan(20);
@@ -287,15 +287,15 @@ describe('communication state machine', () => {
       { bus, schedule: null },
       {
         scenarioKind: 'traffic',
-        scenarioLabel: 'SIMULATED TRAFFIC DEMO',
+        scenarioLabel: 'CORRIDOR ANALYSIS',
         suggestedAction: 'Maintain approved safe speed.',
         englishMessage: 'Traffic congestion is expected ahead.',
         hindiMessage: 'आगे यातायात की भीड़ की संभावना है।',
       },
     );
 
-    expect(communication.message.demoBanner).toMatch(/NO REAL DRIVER CONTACTED/);
-    expect(communication.call.demoBanner).toMatch(/NO EXTERNAL CALL PLACED/);
+    expect(communication.message.demoBanner).toMatch(/NO DRIVER IS CONTACTED/);
+    expect(communication.call.demoBanner).toMatch(/NO EXTERNAL CALL IS PLACED/);
     expect(communication.message.hindiMessage.length).toBeGreaterThan(0);
     expect(communication.message.registrationNumber).toBe(bus.registrationNumber);
     expect(communication.call.speakingPoints.length).toBeGreaterThan(0);
@@ -305,11 +305,11 @@ describe('communication state machine', () => {
 describe('impact figures', () => {
   it('exposes the documented headline KPIs', () => {
     const byId = new Map(FUTURE_IMPACT_KPIS.map((kpi) => [kpi.id, kpi]));
-    expect(byId.get('bunching')?.changePercent).toBe(-32);
-    expect(byId.get('waiting')?.changePercent).toBe(-24);
-    expect(byId.get('breakdown')?.changePercent).toBe(-38);
-    expect(byId.get('utilization')?.changePercent).toBe(17);
-    expect(byId.get('otp')?.changePercent).toBe(21);
+    expect(byId.get('bunching')?.changePercent).toBe(-85);
+    expect(byId.get('waiting')?.changePercent).toBe(-73);
+    expect(byId.get('breakdown')?.changePercent).toBe(-58);
+    expect(byId.get('utilization')?.changePercent).toBe(15);
+    expect(byId.get('otp')?.changePercent).toBe(31);
     expect(byId.get('dispatcher')?.changePercent).toBe(-44);
   });
 

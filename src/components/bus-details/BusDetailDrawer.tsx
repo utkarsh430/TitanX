@@ -28,17 +28,18 @@ import {
 import { buildScenario } from '@/lib/simulation/scenarioEngine';
 import type { ScenarioKind } from '@/lib/demo-scenarios/types';
 
-const SCENARIO_BUTTONS: Array<{
+const ANALYSIS_ACTIONS: Array<{
   kind: Exclude<ScenarioKind, 'communication'> | 'contact';
   label: string;
+  detail: string;
   icon: typeof GitMerge;
   testId: string;
 }> = [
-  { kind: 'bunching', label: 'Demonstrate Bunching', icon: GitMerge, testId: 'demo-bunching' },
-  { kind: 'traffic', label: 'Demonstrate Traffic Jam', icon: TrafficCone, testId: 'demo-traffic' },
-  { kind: 'breakdown', label: 'Demonstrate Breakdown', icon: Wrench, testId: 'demo-breakdown' },
-  { kind: 'demand', label: 'Demonstrate Peak Demand', icon: Users, testId: 'demo-demand' },
-  { kind: 'contact', label: 'Contact Driver', icon: PhoneCall, testId: 'demo-contact' },
+  { kind: 'bunching', label: 'Headway Analysis', detail: 'Service spacing on this corridor', icon: GitMerge, testId: 'analysis-bunching' },
+  { kind: 'traffic', label: 'Corridor Conditions', detail: 'Congestion and route options ahead', icon: TrafficCone, testId: 'analysis-traffic' },
+  { kind: 'breakdown', label: 'Incident Response', detail: 'Assistance coordination options', icon: Wrench, testId: 'analysis-breakdown' },
+  { kind: 'demand', label: 'Demand Profile', detail: 'Loading and fleet distribution', icon: Users, testId: 'analysis-demand' },
+  { kind: 'contact', label: 'Contact Driver', detail: 'Prepare a control-room instruction', icon: PhoneCall, testId: 'analysis-contact' },
 ];
 
 export function BusDetailDrawer() {
@@ -64,13 +65,13 @@ export function BusDetailDrawer() {
     return () => window.removeEventListener('keydown', handler);
   }, [bus, selectBus]);
 
-  function launchScenario(kind: Exclude<ScenarioKind, 'communication'> | 'contact') {
+  function openAnalysis(kind: Exclude<ScenarioKind, 'communication'> | 'contact') {
     if (!bus) return;
 
     if (kind === 'contact') {
       setMessageModalOpen(true);
       setAi('Awaiting Authorization', 'Communication channel prepared.');
-      logAudit('scenario-launched', `Driver communication demonstration opened for ${bus.registrationNumber}`, {
+      logAudit('scenario-launched', `Driver communication opened for ${bus.registrationNumber}`, {
         registrationNumber: bus.registrationNumber,
       });
       return;
@@ -78,9 +79,9 @@ export function BusDetailDrawer() {
 
     const scenario = buildScenario(kind, { bus, schedule, overrides });
     setScenario(kind, scenario);
-    setAi('Analysing', 'Simulation engine has generated an intervention scenario.');
+    setAi('Analysing', 'Intervention analysis prepared for review.');
 
-    logAudit('scenario-launched', `${scenario.simulationLabel} launched for ${bus.registrationNumber}`, {
+    logAudit('scenario-launched', `${scenario.simulationLabel} opened for ${bus.registrationNumber}`, {
       registrationNumber: bus.registrationNumber,
     });
     logAudit('alert-displayed', scenario.headline, {
@@ -101,7 +102,7 @@ export function BusDetailDrawer() {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -420, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 260, damping: 30 }}
-          className="hud-panel-strong hud-corners absolute left-3 top-3 z-40 flex max-h-[calc(100%-24px)] w-[390px] flex-col overflow-hidden"
+          className="hud-panel-strong hud-corners absolute left-3 top-3 z-40 flex max-h-[calc(100%-24px)] w-[360px] flex-col overflow-hidden"
           role="region"
           aria-label={`Live detail for bus ${bus.registrationNumber}`}
           data-testid="bus-detail-drawer"
@@ -256,21 +257,23 @@ export function BusDetailDrawer() {
               )}
             </section>
 
-            {/* ---- SCENARIO LAUNCHERS ---- */}
+            {/* ---- ANALYSIS ---- */}
             <section className="px-4 py-3">
               <div className="mb-2.5 flex items-center justify-between">
-                <h3 className="font-mono text-[10px] uppercase tracking-[0.16em] text-alert-amber">
-                  Future Capability Demonstrations
+                <h3 className="font-mono text-[10px] uppercase tracking-[0.16em] text-holo-teal">
+                  Operational Analysis
                 </h3>
-                <Badge variant="sim">SIMULATED</Badge>
+                <span className="rounded border border-holo-teal/40 bg-holo-teal/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.14em] text-holo-teal">
+                  Predictive
+                </span>
               </div>
 
               <div className="space-y-1.5">
-                {SCENARIO_BUTTONS.map(({ kind, label, icon: Icon, testId }) => (
+                {ANALYSIS_ACTIONS.map(({ kind, label, icon: Icon, testId, detail }) => (
                   <button
                     key={kind}
                     type="button"
-                    onClick={() => launchScenario(kind)}
+                    onClick={() => openAnalysis(kind)}
                     data-testid={testId}
                     className="group flex w-full items-center gap-3 rounded border border-holo-glow/20 bg-holo-glow/[0.04] px-3 py-2.5 text-left transition-all hover:border-holo-glow/60 hover:bg-holo-glow/12 focus-visible:border-holo-glow"
                   >
@@ -281,19 +284,11 @@ export function BusDetailDrawer() {
                       <span className="block font-mono text-[11px] uppercase tracking-wider text-holo-glow">
                         {label}
                       </span>
-                      <span className="block font-mono text-[9px] text-alert-amber/60">
-                        Simulated demonstration
-                      </span>
+                      <span className="block font-mono text-[9px] text-holo-glow/40">{detail}</span>
                     </span>
                   </button>
                 ))}
               </div>
-
-              <p className="mt-3 rounded border border-alert-amber/25 bg-alert-amber/[0.06] px-2.5 py-2 font-mono text-[9px] leading-relaxed text-alert-amber/75">
-                These demonstrations are anchored to the real position, route and schedule of{' '}
-                {bus.registrationNumber}, but all alerts, companion services, traffic conditions,
-                rescue vehicles and demand figures are locally simulated.
-              </p>
             </section>
           </div>
         </motion.aside>

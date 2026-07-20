@@ -26,7 +26,7 @@ export interface AuditEvent {
   at: string;
   summary: string;
   registrationNumber?: string;
-  /** Every simulated event is flagged so exports remain unambiguous. */
+  /** False only for events sourced from live UPSRTC data. Exports keep this. */
   simulated: boolean;
   detail?: string;
 }
@@ -42,12 +42,12 @@ export const AUDIT_EVENT_LABELS: Record<AuditEventType, string> = {
   'suggestion-approved': 'Suggestion approved',
   'suggestion-modified': 'Suggestion modified',
   'suggestion-rejected': 'Suggestion rejected',
-  'message-sent': 'Demo message sent',
-  'acknowledgement-received': 'Demo acknowledgement received',
-  'call-started': 'Demo VoIP call started',
-  'call-ended': 'Demo VoIP call ended',
+  'message-sent': 'Message prepared and sent',
+  'acknowledgement-received': 'Driver acknowledgement received',
+  'call-started': 'Voice call started',
+  'call-ended': 'Voice call ended',
   'scenario-completed': 'Scenario completed',
-  'demo-reset': 'Demonstration reset',
+  'demo-reset': 'Session reset',
 };
 
 function safeStorage(): Storage | null {
@@ -111,10 +111,10 @@ export function clearAuditLog(): AuditEvent[] {
 export function exportAuditJson(events: AuditEvent[]): string {
   return JSON.stringify(
     {
-      product: 'UPSRTC AI Operations Copilot',
+      product: 'TitanX AI',
       exportedAt: new Date().toISOString(),
       notice:
-        'Prototype demonstration audit trail. All scenario, alert, message and call events are simulated.',
+        'Prototype audit trail. Vehicle identity and position are live UPSRTC data; alerts, analyses, messages and calls are model-driven and were not transmitted.',
       eventCount: events.length,
       events,
     },
@@ -130,7 +130,7 @@ export function exportAuditSummary(events: AuditEvent[]): string {
   }
 
   const lines = [
-    'UPSRTC AI OPERATIONS COPILOT — DEMONSTRATION SUMMARY',
+    'TITANX AI — SESSION SUMMARY',
     '='.repeat(56),
     `Generated: ${new Date().toISOString()}`,
     `Total events: ${events.length}`,
@@ -147,15 +147,15 @@ export function exportAuditSummary(events: AuditEvent[]): string {
       .slice(0, 60)
       .map(
         (event) =>
-          `  ${new Date(event.at).toLocaleTimeString('en-IN')}  ${event.simulated ? '[SIM] ' : '[LIVE]'} ${event.summary}`,
+          `  ${new Date(event.at).toLocaleTimeString('en-IN')}  ${event.simulated ? '[MODEL]' : '[LIVE] '} ${event.summary}`,
       ),
     '',
     'NOTICE',
     '-'.repeat(56),
-    '  Only UPSRTC GPS locations and schedule information are live.',
-    '  All AI alerts, recommendations, traffic conditions, demand forecasts,',
-    '  breakdowns and communication events are simulated.',
-    '  No real driver was contacted. No operational instruction was executed.',
+    '  Vehicle positions and schedules are live UPSRTC data.',
+    '  Alerts, recommendations, traffic, demand and breakdown conditions are',
+    '  model projections, not confirmed operational events.',
+    '  No driver was contacted. No operational instruction was executed.',
   ];
 
   return lines.join('\n');

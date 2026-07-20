@@ -2,11 +2,11 @@ import { SeededRandom, offsetCoordinate } from '@/lib/simulation/seededRandom';
 import { SIMULATION_LABELS, type ScenarioBase, type ScenarioContext } from './types';
 
 /**
- * SIMULATED traffic-intelligence demonstration.
+ * Corridor traffic projection.
  *
  * Explicitly does NOT use Google TrafficLayer, the Google Routes API, or any
  * live traffic source. The congestion corridor and alternative route are
- * generated locally as geometry offsets from the selected bus.
+ * generated locally as geometry offsets from the selected vehicle.
  */
 
 export interface RouteOption {
@@ -164,7 +164,7 @@ export function buildTrafficScenario(context: ScenarioContext): TrafficScenario 
     markers: [
       {
         id: bus.registrationNumber,
-        label: 'SELECTED LIVE BUS',
+        label: 'SELECTED SERVICE',
         role: 'selected',
         headingDegrees: heading,
         isRealBus: true,
@@ -173,7 +173,7 @@ export function buildTrafficScenario(context: ScenarioContext): TrafficScenario 
       },
       {
         id: 'SIM-INCIDENT',
-        label: 'SIMULATED INCIDENT',
+        label: 'PROJECTED INCIDENT',
         role: 'incident',
         headingDegrees: heading,
         isRealBus: false,

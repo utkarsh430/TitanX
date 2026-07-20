@@ -12,7 +12,7 @@ plain text, buttons in **bold**.
 
 _Full-screen command centre, no bus selected._
 
-> "This is the UPSRTC AI Operations Copilot.
+> "This is TitanX AI.
 >
 > What you are looking at is not a mock-up. Every marker on this map is a real
 > UPSRTC bus, streaming live from our own GPS infrastructure, refreshed every
@@ -24,13 +24,19 @@ _Point at the live bus count in the top bar._
 > reporting. One hundred and forty-three depots. Nearly twelve hundred routes.
 >
 > I want to be precise about one thing from the outset, because it matters.
-> The vehicle positions and the schedules are live and real. Everything the
-> copilot does with that data — the predictions, the recommendations — is a
-> simulated demonstration of what we could build. Every simulated element on
-> this screen is labelled in amber. Live data is labelled in green."
+> The vehicle positions and the schedules are live and real. What the copilot
+> does with that data — the predictions, the recommendations — is model output.
+> Those surfaces are marked PREDICTIVE. They are projections for a dispatcher
+> to review, not confirmed events."
 
 _Point at the two badges in the top bar: `LIVE UPSRTC GPS` and
-`SIMULATED AI CAPABILITIES`._
+`PREDICTIVE ENGINE ACTIVE`._
+
+_Point at the Alert Centre._
+
+> "And the copilot is already working. Five conditions flagged across the
+> network, each attached to a real vehicle, with a new one surfacing roughly
+> every half minute."
 
 ---
 
@@ -98,14 +104,13 @@ _Click **Stop sequence** to expand it._
 
 ## 5. Bunching capability — 90 seconds
 
-_Click **Demonstrate Bunching**._
+_Click the top **Headway** alert in the Alert Centre._
 
-> "Now everything you see in amber is simulated. This is the capability
-> demonstration."
+> "The copilot has already flagged this one. Let me open it."
 
 _Point at the three-service diagram._
 
-> "The copilot places the selected live bus in the middle. Ahead of it, a
+> "The copilot places the selected service in the middle. Ahead of it, a
 > preceding service. Behind it, a following service.
 >
 > The forward gap has collapsed to three minutes. The rear gap has stretched to
@@ -132,7 +137,7 @@ _Click **Apply 90s hold** in the scenario panel._
 
 ## 6. Traffic capability — 75 seconds
 
-_Click **Demonstrate Traffic Jam**._
+_Click a **Corridor** alert in the Alert Centre._
 
 > "Second scenario. The copilot projects congestion four kilometres ahead of
 > this vehicle on its scheduled corridor."
@@ -157,21 +162,21 @@ _Point at the safety note._
 
 ## 7. Breakdown capability — 75 seconds
 
-_Click **Demonstrate Breakdown**._
+_Click a **Vehicle** alert in the Alert Centre._
 
 > "Third scenario, and this is where response time translates directly into
 > passenger experience."
 
 _Point at the red alert._
 
-> "Simulated engine overheating. Forty-seven passengers onboard. Roadside
+> "Projected engine overheating. Forty-seven passengers onboard. Roadside
 > assistance required."
 
 _Point at the three candidates._
 
 > "The copilot has identified three assistance options and ranked them — by
 > distance, response time, available capacity and route compatibility.
-> SIM-RESCUE-02 arrives in about eleven minutes with thirty-one seats."
+> RESCUE-02 arrives in about eleven minutes with thirty-one seats."
 
 _Point at the response timeline._
 
@@ -183,7 +188,7 @@ _Point at the response timeline._
 
 ## 8. Demand capability — 75 seconds
 
-_Click **Demonstrate Peak Demand**._
+_Click **Fleet Distribution** in the top command bar._
 
 > "Fourth scenario. This one is about the fleet, not one vehicle."
 
@@ -209,27 +214,25 @@ _Point at the before/after figures._
 ## 9. Driver communication — 60 seconds
 
 _Click **Send to Driver** in the copilot panel (or **Contact Driver** in the
-bus drawer)._
+vehicle panel)._
 
 > "None of this is useful unless it reaches the driver."
 
 _Point at the banner._
 
-> "Note the banner: this is a demonstration message. No real driver is
-> contacted."
+> "Note the banner: no driver is contacted from this prototype."
 
 _Point at the two message fields._
 
 > "The instruction is prepared in English and in Hindi. The dispatcher can edit
 > either before approving."
 
-_Click **Approve & Send (Simulated)**._
+_Click **Approve & Send**._
 
 > "Encrypted channel, delivery confirmation, driver acknowledgement — and every
 > step of that written to an audit trail."
 
-_Optionally click **Start VoIP Call (Simulated)**, let it connect, then
-**End Call**._
+_Optionally click **Start Voice Call**, let it connect, then **End Call**._
 
 > "And where a message is not enough, a voice channel — with the incident
 > context and suggested speaking points in front of the dispatcher, and an
@@ -251,7 +254,7 @@ _Point across the KPI grid._
 
 _Point at the footer disclaimer._
 
-> "I want to be careful here. These are illustrative demonstration estimates,
+> "I want to be careful here. These are modelled estimates,
 > not measured results. The only honest way to establish real numbers is a
 > controlled pilot."
 
@@ -289,7 +292,8 @@ _Press **Esc** to close the impact view._
 
 ## Fallback: automated Pitch Mode
 
-If you would rather not drive manually, click **Pitch Mode** in the top bar.
+If you would rather not drive manually, click **Pitch Mode** in the bottom
+intelligence strip (Scenario Timeline panel).
 It runs the same sequence automatically in about 105 seconds with on-screen
 captions. Controls: **Pause**, **Previous**, **Next**, **Exit**
 (or `Space`, `←`, `→`, `Esc`). No audio is played.

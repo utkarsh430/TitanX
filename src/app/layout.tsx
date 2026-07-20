@@ -17,9 +17,9 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'UPSRTC AI Operations Copilot — Predictive Fleet Command Intelligence',
+  title: 'TitanX AI — Predictive Fleet Command Intelligence',
   description:
-    'Prototype command-centre demonstration. Live UPSRTC GPS and schedule integration with simulated predictive operations capabilities.',
+    'Predictive fleet command intelligence. Live UPSRTC GPS and schedule integration with a predictive operations copilot.',
 };
 
 export const viewport: Viewport = {

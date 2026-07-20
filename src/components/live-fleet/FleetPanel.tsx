@@ -62,7 +62,7 @@ export function FleetPanel({ onVisibleCountChange }: { onVisibleCountChange: (n:
 
   return (
     <aside
-      className="hud-panel hud-corners relative z-20 flex w-[310px] shrink-0 flex-col overflow-hidden"
+      className="hud-panel hud-corners relative z-20 flex w-[272px] shrink-0 flex-col overflow-hidden"
       aria-label="Live fleet navigation"
     >
       <header className="shrink-0 border-b border-holo-glow/15 px-3 py-2.5">

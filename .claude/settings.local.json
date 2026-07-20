@@ -28,7 +28,9 @@
       "Bash(npx playwright *)",
       "Bash(cp /tmp/shot.mjs ./shot.mjs)",
       "Bash(node ./shot.mjs)",
-      "Bash(python3 -)"
+      "Bash(python3 -)",
+      "Bash(git mv *)",
+      "Bash(mv docs/LIVE_VS_SIMULATED.md docs/LIVE_VS_PREDICTED.md)"
     ]
   }
 }

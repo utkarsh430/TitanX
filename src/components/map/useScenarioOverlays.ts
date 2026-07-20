@@ -14,10 +14,10 @@ type Overlay =
   | google.maps.Polygon;
 
 /**
- * Draws all SIMULATED scenario geometry onto the map.
+ * Draws all projected scenario geometry onto the map.
  *
- * Every shape here is generated locally by the scenario templates. No live
- * traffic layer, no Routes API, no real rescue vehicles.
+ * Every shape here is generated locally by the scenario models. No live traffic
+ * layer, no Routes API, no dispatched assistance vehicles.
  */
 export function useScenarioOverlays(map: google.maps.Map | null): void {
   const scenario = useCopilotStore((state) => state.activeScenario);
@@ -86,7 +86,7 @@ export function useScenarioOverlays(map: google.maps.Map | null): void {
     };
   }, [map, schedule]);
 
-  // ---- Simulated scenario geometry ----------------------------------------
+  // ---- Projected scenario geometry ----------------------------------------
   useEffect(() => {
     if (!map) return;
 
@@ -181,7 +181,7 @@ export function useScenarioOverlays(map: google.maps.Map | null): void {
     if (scenario.kind === 'traffic') {
       const traffic = scenario as TrafficScenario;
 
-      // Simulated congestion corridor — NOT Google traffic data.
+      // Modelled congestion corridor — NOT Google traffic data.
       overlays.push(
         new google.maps.Polyline({
           path: traffic.congestionCorridor.map((p) => ({ lat: p.latitude, lng: p.longitude })),
@@ -229,7 +229,7 @@ export function useScenarioOverlays(map: google.maps.Map | null): void {
             strokeColor: '#ffb0b8',
             strokeWeight: 2,
           },
-          title: 'SIMULATED INCIDENT',
+          title: 'Projected incident',
           zIndex: 900,
         }),
       );
@@ -284,7 +284,7 @@ export function useScenarioOverlays(map: google.maps.Map | null): void {
               strokeColor: '#02040a',
               strokeWeight: 1.5,
             },
-            title: `${candidate.id} — simulated assistance (${candidate.responseTimeMinutes} min)`,
+            title: `${candidate.id} — assistance candidate (${candidate.responseTimeMinutes} min)`,
             zIndex: 850,
           }),
         );

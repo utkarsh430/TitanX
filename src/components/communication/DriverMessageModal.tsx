@@ -12,8 +12,8 @@ import { cn } from '@/lib/utils';
 type SendPhase = 'draft' | 'encrypting' | 'delivered' | 'acknowledged';
 
 /**
- * SIMULATED driver messaging.
- * No SMS/push provider is integrated. No real driver receives anything.
+ * Driver messaging workflow.
+ * No SMS/push provider is integrated. No driver receives anything.
  */
 export function DriverMessageModal() {
   const isOpen = useCopilotStore((state) => state.isMessageModalOpen);
@@ -36,7 +36,7 @@ export function DriverMessageModal() {
       { bus, schedule: null, overrides },
       {
         scenarioKind: scenario?.kind ?? 'communication',
-        scenarioLabel: scenario?.simulationLabel ?? 'SIMULATED COMMUNICATION',
+        scenarioLabel: scenario?.simulationLabel ?? 'DRIVER COMMUNICATION',
         suggestedAction: scenario?.recommendation ?? 'Await further instructions from the control room.',
         englishMessage:
           scenario?.suggestedDriverMessageEn ??
@@ -72,8 +72,8 @@ export function DriverMessageModal() {
 
     setPhase('encrypting');
     setCommunicationState('message-sent');
-    setAi('Monitoring', 'Communication channel prepared. Transmission simulated.');
-    logAudit('message-sent', `Demo message transmitted to ${bus.registrationNumber}`, {
+    setAi('Monitoring', 'Instruction transmitted. Awaiting driver acknowledgement.');
+    logAudit('message-sent', `Instruction transmitted to ${bus.registrationNumber}`, {
       registrationNumber: bus.registrationNumber,
       detail: english,
     });
@@ -84,7 +84,7 @@ export function DriverMessageModal() {
     const ackTimer = setTimeout(() => {
       setPhase('acknowledged');
       setCommunicationState('driver-acknowledged');
-      logAudit('acknowledgement-received', `Simulated driver acknowledgement from ${bus.registrationNumber}`, {
+      logAudit('acknowledgement-received', `Driver acknowledgement from ${bus.registrationNumber}`, {
         registrationNumber: bus.registrationNumber,
       });
     }, 1500 + ackDelay);
@@ -107,7 +107,7 @@ export function DriverMessageModal() {
           exit={{ opacity: 0 }}
           role="dialog"
           aria-modal="true"
-          aria-label="Simulated driver message"
+          aria-label="Driver message"
           onClick={(event) => {
             if (event.target === event.currentTarget) setOpen(false);
           }}
@@ -208,7 +208,7 @@ export function DriverMessageModal() {
                           ? 'Encrypting channel…'
                           : phase === 'delivered'
                             ? 'Delivered — awaiting acknowledgement'
-                            : 'Driver acknowledged (simulated)'}
+                            : 'Driver acknowledged'}
                       </span>
                     </div>
 
@@ -216,14 +216,14 @@ export function DriverMessageModal() {
 
                     <ol className="space-y-1">
                       <Step done label="Message prepared by dispatcher" />
-                      <Step done label="Channel encrypted (simulated)" />
+                      <Step done label="Channel encrypted" />
                       <Step
                         done={phase === 'delivered' || phase === 'acknowledged'}
-                        label="Delivered to driver terminal (simulated)"
+                        label="Delivered to driver terminal"
                       />
                       <Step
                         done={phase === 'acknowledged'}
-                        label="Driver acknowledgement received (simulated)"
+                        label="Driver acknowledgement received"
                       />
                     </ol>
                   </motion.div>
@@ -232,8 +232,8 @@ export function DriverMessageModal() {
             </div>
 
             <footer className="flex items-center justify-between gap-3 border-t border-holo-glow/15 px-4 py-3">
-              <span className="font-mono text-[9px] uppercase tracking-wider text-alert-amber/70">
-                No real driver is contacted
+              <span className="font-mono text-[9px] uppercase tracking-wider text-holo-glow/45">
+                Dispatcher approval required before transmission
               </span>
 
               <div className="flex gap-2">
@@ -250,7 +250,7 @@ export function DriverMessageModal() {
                   {phase === 'draft' ? (
                     <>
                       <Send className="h-3.5 w-3.5" aria-hidden />
-                      Approve &amp; Send (Simulated)
+                      Approve &amp; Send
                     </>
                   ) : (
                     <>

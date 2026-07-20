@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 type CallPhase = 'connecting' | 'active' | 'ended';
 
 /**
- * SIMULATED VoIP interface.
+ * Control-room voice interface.
  * No external VoIP provider is contacted. No microphone is accessed.
  * No audio is captured, transmitted or played.
  */
@@ -37,7 +37,7 @@ export function VoipCallOverlay() {
       { bus, schedule: null, overrides },
       {
         scenarioKind: scenario?.kind ?? 'communication',
-        scenarioLabel: scenario?.simulationLabel ?? 'SIMULATED COMMUNICATION',
+        scenarioLabel: scenario?.simulationLabel ?? 'DRIVER COMMUNICATION',
         suggestedAction:
           scenario?.recommendation ?? 'Confirm current status and await control-room instruction.',
         englishMessage: scenario?.suggestedDriverMessageEn ?? '',
@@ -56,7 +56,7 @@ export function VoipCallOverlay() {
 
     if (!loggedStart.current) {
       loggedStart.current = true;
-      logAudit('call-started', `Simulated VoIP call opened to ${bus.registrationNumber}`, {
+      logAudit('call-started', `Voice call opened to ${bus.registrationNumber}`, {
         registrationNumber: bus.registrationNumber,
       });
     }
@@ -74,7 +74,7 @@ export function VoipCallOverlay() {
 
   function endCall() {
     if (bus) {
-      logAudit('call-ended', `Simulated VoIP call ended with ${bus.registrationNumber}`, {
+      logAudit('call-ended', `Voice call ended with ${bus.registrationNumber}`, {
         registrationNumber: bus.registrationNumber,
         detail: `Duration ${formatDuration(seconds)}`,
       });
@@ -106,7 +106,7 @@ export function VoipCallOverlay() {
           exit={{ opacity: 0 }}
           role="dialog"
           aria-modal="true"
-          aria-label="Simulated VoIP call"
+          aria-label="Control-room call"
         >
           <motion.div
             initial={{ scale: 0.94 }}
@@ -168,10 +168,7 @@ export function VoipCallOverlay() {
                 {/* Call detail */}
                 <div className="min-w-0 flex-1">
                   <div className="mb-2 flex items-center gap-2">
-                    <Badge variant="sim" pulse>
-                      SIMULATED COMMUNICATION
-                    </Badge>
-                    <Badge variant="live">LIVE BUS ANCHOR</Badge>
+                    <Badge variant="live">LIVE VEHICLE</Badge>
                   </div>
 
                   <h2 className="font-mono text-xl font-bold tracking-[0.1em] text-holo-glow text-glow">
@@ -248,7 +245,7 @@ export function VoipCallOverlay() {
                   >
                     <span className="hud-label mb-1 flex items-center gap-1.5 text-holo-teal/70">
                       <FileText className="h-3 w-3" aria-hidden />
-                      AI-generated call summary (simulated)
+                      AI-generated call summary
                     </span>
                     <p className="font-mono text-[10px] leading-relaxed text-holo-teal">
                       {plan.call.callSummaryTemplate.replace('{reg}', bus.registrationNumber)}

@@ -111,12 +111,12 @@ export function DiagnosticsDrawer() {
                 tone={mapKeyConfigured ? 'green' : 'crimson'}
               />
               <Row label="Basemap" value="Google Maps JavaScript API" />
-              <Row label="Traffic layer" value="disabled (simulated only)" tone="amber" />
+              <Row label="Traffic layer" value="disabled (modelled only)" tone="amber" />
               <Row label="Routes API" value="not used" tone="amber" />
               <Row label="Marker clustering" value="enabled" tone="green" />
             </Group>
 
-            <Group title="Simulation Engine" icon={Activity}>
+            <Group title="Prediction Engine" icon={Activity}>
               <Row label="LLM calls" value="none — local templates" tone="green" />
               <Row label="Seeding" value="deterministic per registration" tone="green" />
               <Row label="Fixture mode" value={process.env.NEXT_PUBLIC_DEMO_MODE === '1' ? 'FORCED' : 'auto'} />

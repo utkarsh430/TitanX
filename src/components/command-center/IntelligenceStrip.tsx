@@ -49,7 +49,7 @@ export function IntelligenceStrip() {
     return { good, degraded, stale };
   }, [buses]);
 
-  // Simulated demand curve for the ambient strip readout.
+  // Modelled demand curve for the ambient strip readout.
   const demandCurve = useMemo(
     () =>
       Array.from({ length: 24 }, (_, hour) => ({
@@ -107,7 +107,7 @@ export function IntelligenceStrip() {
       </Panel>
 
       {/* Network health */}
-      <Panel title="Network Health" icon={Activity} badge={<Badge variant="sim">SIMULATED</Badge>} className="w-[210px]">
+      <Panel title="Network Health" icon={Activity} className="w-[210px]">
         <div className="space-y-1.5">
           <HealthBar label="Good fix" value={qualityCounts.good} total={buses.length} tone="green" />
           <HealthBar label="Degraded" value={qualityCounts.degraded} total={buses.length} tone="amber" />
@@ -119,7 +119,7 @@ export function IntelligenceStrip() {
       <Panel
         title="Demand Curve"
         icon={BarChart3}
-        badge={<Badge variant="sim">SIMULATED</Badge>}
+        badge={<PredictiveChip />}
         className="w-[200px]"
       >
         <div className="h-11">
@@ -143,7 +143,7 @@ export function IntelligenceStrip() {
           </ResponsiveContainer>
         </div>
         <p className="mt-0.5 font-mono text-[9px] text-holo-glow/35">
-          Twin-peak weekday profile (illustrative)
+          Twin-peak weekday profile
         </p>
       </Panel>
 
@@ -151,7 +151,6 @@ export function IntelligenceStrip() {
       <Panel
         title="Active Incidents"
         icon={TriangleAlert}
-        badge={<Badge variant="sim">SIM</Badge>}
         className="w-[186px]"
       >
         <div className="flex h-full flex-col items-center justify-center">
@@ -164,7 +163,7 @@ export function IntelligenceStrip() {
             {activeIncidents}
           </span>
           <span className="font-mono text-[9px] uppercase tracking-wider text-holo-glow/40">
-            {scenario ? scenario.severityText : 'No simulated incident'}
+            {scenario ? scenario.severityText : 'None open'}
           </span>
         </div>
       </Panel>
@@ -192,6 +191,7 @@ export function IntelligenceStrip() {
             type="button"
             onClick={() => setPitchMode(true)}
             className="hud-button flex-1 px-1.5 text-[9px]"
+            data-testid="start-pitch-mode-strip"
           >
             <Play className="h-3 w-3" aria-hidden />
             Pitch Mode
@@ -230,14 +230,7 @@ export function IntelligenceStrip() {
               <span className="shrink-0 font-mono text-[8px] tabular-nums text-holo-glow/25">
                 {formatIndiaTime(event.at)}
               </span>
-              <span
-                className={cn(
-                  'shrink-0 font-mono text-[8px] uppercase',
-                  event.simulated ? 'text-alert-amber/60' : 'text-alert-green/60',
-                )}
-              >
-                {event.simulated ? 'SIM' : 'LIVE'}
-              </span>
+
               <span className="shrink-0 font-mono text-[8px] uppercase tracking-wider text-holo-teal/70">
                 {AUDIT_EVENT_LABELS[event.type]}
               </span>
@@ -249,6 +242,15 @@ export function IntelligenceStrip() {
         </div>
       </Panel>
     </footer>
+  );
+}
+
+/** Consistent provenance marker for model-derived panels. */
+function PredictiveChip() {
+  return (
+    <span className="rounded border border-holo-teal/40 bg-holo-teal/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.14em] text-holo-teal">
+      Predictive
+    </span>
   );
 }
 

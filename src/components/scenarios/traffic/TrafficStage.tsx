@@ -2,11 +2,11 @@
 
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, ReferenceLine } from 'recharts';
 import { TrafficCone, ShieldAlert, Route } from 'lucide-react';
-import { Badge, CountUp } from '@/components/shared/hud';
+import { CountUp } from '@/components/shared/hud';
 import type { TrafficScenario } from '@/lib/demo-scenarios/trafficScenario';
 import { cn } from '@/lib/utils';
 
-/** SIMULATED traffic intelligence — no Google TrafficLayer, no Routes API. */
+/** Corridor traffic intelligence — no Google TrafficLayer, no Routes API. */
 export function TrafficStage({ scenario }: { scenario: TrafficScenario }) {
   return (
     <div className="space-y-3" data-testid="traffic-stage">
@@ -15,9 +15,9 @@ export function TrafficStage({ scenario }: { scenario: TrafficScenario }) {
           <TrafficCone className="h-3.5 w-3.5" aria-hidden />
           Corridor Traffic Intelligence
         </h3>
-        <Badge variant="sim" pulse>
-          SIMULATED TRAFFIC-INTELLIGENCE DEMONSTRATION
-        </Badge>
+<span className="rounded border border-holo-teal/40 bg-holo-teal/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.14em] text-holo-teal">
+          Predictive
+        </span>
       </div>
 
       {/* Headline figures */}
@@ -43,7 +43,7 @@ export function TrafficStage({ scenario }: { scenario: TrafficScenario }) {
       <div className="flex items-start gap-2.5 rounded border border-alert-crimson/30 bg-alert-crimson/[0.07] px-3 py-2">
         <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-alert-crimson" aria-hidden />
         <div>
-          <span className="hud-label text-alert-crimson/70">Simulated incident</span>
+          <span className="hud-label text-alert-crimson/70">Projected incident</span>
           <p className="font-mono text-[11px] text-alert-crimson/90">
             {scenario.incidentDescription}
           </p>
@@ -53,7 +53,7 @@ export function TrafficStage({ scenario }: { scenario: TrafficScenario }) {
       {/* Density / speed profile */}
       <div className="rounded border border-holo-glow/15 bg-void-900/50 p-3">
         <span className="hud-label mb-2 block">
-          Simulated traffic density along corridor (km ahead)
+          Projected traffic density along corridor (km ahead)
         </span>
         <div className="h-36">
           <ResponsiveContainer width="100%" height="100%">
@@ -91,7 +91,7 @@ export function TrafficStage({ scenario }: { scenario: TrafficScenario }) {
                 labelStyle={{ color: '#3ff0ff' }}
                 formatter={(value: number, name: string) => [
                   name === 'densityPercent' ? `${value}%` : `${value} km/h`,
-                  name === 'densityPercent' ? 'Density (sim)' : 'Speed (sim)',
+                  name === 'densityPercent' ? 'Density' : 'Speed',
                 ]}
               />
               <ReferenceLine
@@ -147,7 +147,11 @@ export function TrafficStage({ scenario }: { scenario: TrafficScenario }) {
                 <Route className="h-3 w-3" aria-hidden />
                 {route.name}
               </span>
-              {route.isRecommended && <Badge variant="sim">SUGGESTED</Badge>}
+              {route.isRecommended && (
+                <span className="rounded border border-holo-glow/50 bg-holo-glow/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider text-holo-glow">
+                  Suggested
+                </span>
+              )}
             </div>
 
             <div className="mb-2 flex items-baseline gap-1.5">
@@ -177,7 +181,7 @@ export function TrafficStage({ scenario }: { scenario: TrafficScenario }) {
       {/* Saving */}
       <div className="flex items-center justify-between rounded border border-alert-green/30 bg-alert-green/[0.07] px-3 py-2">
         <span className="font-mono text-[10px] uppercase tracking-wider text-alert-green/70">
-          Potential simulated saving
+          Potential saving
         </span>
         <span className="font-mono text-lg tabular-nums text-alert-green">
           <CountUp value={scenario.potentialSavingMinutes} suffix=" min" />

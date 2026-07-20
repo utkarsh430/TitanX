@@ -28,7 +28,7 @@ export function FleetMap() {
   const isPitchMode = useCopilotStore((state) => state.isPitchMode);
   const selectedBus = useSelectedBus();
 
-  // Simulated scenario geometry (corridors, congestion, rescue links, heatmap).
+  // Projected scenario geometry (corridors, congestion, assistance links, heatmap).
   useScenarioOverlays(mapInstance);
 
   // ---- Map bootstrap -------------------------------------------------------

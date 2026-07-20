@@ -7,7 +7,7 @@ import type { ScenarioContext, ScenarioKind } from '@/lib/demo-scenarios/types';
 export type AnyScenario = BunchingScenario | TrafficScenario | BreakdownScenario | DemandScenario;
 
 /**
- * Single entry point for building a SIMULATED scenario.
+ * Single entry point for building a predictive scenario.
  * Deterministic: same bus + same overrides always yields the same output.
  */
 export function buildScenario(
@@ -35,9 +35,9 @@ export const SCENARIO_TITLES: Record<ScenarioKind, string> = {
 };
 
 export const SCENARIO_FULL_LABELS: Record<ScenarioKind, string> = {
-  bunching: 'FUTURE BUNCHING-OPTIMIZATION DEMONSTRATION',
-  traffic: 'SIMULATED TRAFFIC-INTELLIGENCE DEMONSTRATION',
-  breakdown: 'SIMULATED BREAKDOWN-RESPONSE DEMONSTRATION',
-  demand: 'SIMULATED DEMAND AND FLEET-REDISTRIBUTION DEMONSTRATION',
-  communication: 'SIMULATED DRIVER-COMMUNICATION DEMONSTRATION',
+  bunching: 'HEADWAY OPTIMIZATION',
+  traffic: 'CORRIDOR TRAFFIC INTELLIGENCE',
+  breakdown: 'BREAKDOWN RESPONSE COORDINATION',
+  demand: 'DEMAND AND FLEET REDISTRIBUTION',
+  communication: 'DRIVER COMMUNICATION',
 };

@@ -4,10 +4,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { useCopilotStore } from '@/stores/copilotStore';
 import { useLiveFleet } from '@/hooks/useLiveFleet';
 import { useSchedule } from '@/hooks/useSchedule';
+import { useAlertStream } from '@/hooks/useAlertStream';
 import { AmbientBackdrop } from '@/components/shared/hud';
 import { TopCommandBar } from './TopCommandBar';
 import { IntelligenceStrip } from './IntelligenceStrip';
 import { FleetPanel } from '@/components/live-fleet/FleetPanel';
+import { AlertCentre } from '@/components/alerts/AlertCentre';
+import { AlertToasts } from '@/components/alerts/AlertToasts';
 import { FleetMap } from '@/components/map/FleetMap';
 import { CopilotPanel } from '@/components/ai-core/CopilotPanel';
 import { BusDetailDrawer } from '@/components/bus-details/BusDetailDrawer';
@@ -30,6 +33,7 @@ export function CommandCenter() {
   // Live UPSRTC polling + on-demand schedule fetch.
   useLiveFleet();
   useSchedule();
+  useAlertStream();
 
   useEffect(() => {
     hydrateAudit();
@@ -69,9 +73,11 @@ export function CommandCenter() {
         aria-label="Command centre"
       >
         <FleetPanel onVisibleCountChange={setVisibleCount} />
+        <AlertCentre />
 
-        <section className="relative min-w-0 flex-1" aria-label="Fleet map and scenario stage">
+        <section className="relative min-w-0 flex-1" aria-label="Fleet map and analysis stage">
           <FleetMap />
+          <AlertToasts />
           <BusDetailDrawer />
           <ScenarioStage />
         </section>

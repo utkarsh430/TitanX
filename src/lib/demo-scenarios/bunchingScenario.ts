@@ -7,11 +7,10 @@ import {
 } from './types';
 
 /**
- * SIMULATED bus-bunching demonstration.
+ * Bus-bunching projection.
  *
- * No headway mathematics is performed against the real fleet. The companion
- * services are fictional markers placed relative to the selected bus so the
- * geometry looks plausible on the map.
+ * The selected vehicle is real. The companion services are modelled markers
+ * placed relative to it — no headway mathematics is run against the live fleet.
  */
 
 export interface BunchingScenario extends ScenarioBase {
@@ -51,7 +50,7 @@ export function buildBunchingScenario(context: ScenarioContext): BunchingScenari
   const markers: SimulatedBusMarker[] = [
     {
       id: 'SIM-SERVICE-A',
-      label: 'SIMULATED SERVICE A',
+      label: 'SERVICE AHEAD',
       role: 'ahead',
       headingDegrees: heading,
       isRealBus: false,
@@ -59,7 +58,7 @@ export function buildBunchingScenario(context: ScenarioContext): BunchingScenari
     },
     {
       id: bus.registrationNumber,
-      label: 'SELECTED LIVE BUS',
+      label: 'SELECTED SERVICE',
       role: 'selected',
       headingDegrees: heading,
       isRealBus: true,
@@ -68,7 +67,7 @@ export function buildBunchingScenario(context: ScenarioContext): BunchingScenari
     },
     {
       id: 'SIM-SERVICE-C',
-      label: 'SIMULATED SERVICE C',
+      label: 'SERVICE BEHIND',
       role: 'behind',
       headingDegrees: heading,
       isRealBus: false,
@@ -106,7 +105,7 @@ export function buildBunchingScenario(context: ScenarioContext): BunchingScenari
       'The selected service is closing the gap with the preceding service while the following service remains significantly delayed. Without intervention, both services are projected to arrive together at the next major passenger stop.',
     recommendation: `Hold the selected bus for ${holdSeconds} seconds at the next authorized bus station.`,
     expectedOutcome: `Forward gap recovers from ${gapAheadMinutes} minutes to approximately ${projectedGapAheadAfter} minutes, restoring a more even headway across ${routeLabel}.`,
-    affectedBuses: ['SIMULATED SERVICE A', bus.registrationNumber, 'SIMULATED SERVICE C'],
+    affectedBuses: ['SERVICE AHEAD', bus.registrationNumber, 'SERVICE BEHIND'],
     suggestedDriverMessageEn: `Please hold at the next authorized bus station for approximately ${holdSeconds} seconds to restore service spacing. Await control-room confirmation before departing.`,
     suggestedDriverMessageHi: `कृपया सेवा अंतराल ठीक करने के लिए अगले अधिकृत बस स्टेशन पर लगभग ${holdSeconds} सेकंड रुकें। प्रस्थान से पहले नियंत्रण कक्ष की पुष्टि की प्रतीक्षा करें।`,
     actions: [

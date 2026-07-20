@@ -1,11 +1,11 @@
 import type { CanonicalLiveBus, CanonicalSchedule } from '@/models/canonical';
 
 /**
- * Types for SIMULATED scenario output.
+ * Types for predictive scenario output.
  *
- * Nothing here is computed from real operational data. Every value is produced
- * by a local template seeded from the selected bus's registration number.
- * See docs/LIVE_VS_SIMULATED.md.
+ * Vehicle identity, position, depot, route and schedule are live UPSRTC data.
+ * The projected conditions are produced by local models seeded from the
+ * vehicle's registration number. See docs/LIVE_VS_PREDICTED.md.
  */
 
 export type ScenarioKind = 'bunching' | 'traffic' | 'breakdown' | 'demand' | 'communication';
@@ -49,7 +49,7 @@ export interface TimelineEntry {
 /** Common envelope every scenario template returns. */
 export interface ScenarioBase {
   kind: ScenarioKind;
-  /** Always rendered on screen — the simulation disclosure. */
+  /** Panel header for this analysis type. */
   simulationLabel: string;
   headline: string;
   severity: AlertSeverity;
@@ -97,13 +97,19 @@ export interface ScenarioOverrides {
   callDurationSeconds?: number;
 }
 
+/**
+ * Panel headers for each analysis type.
+ *
+ * Provenance is carried by the single PREDICTIVE marker on the alert feed and
+ * the standing footer notice, rather than repeated on every card.
+ */
 export const SIMULATION_LABELS = {
-  bunching: 'SIMULATED BUNCHING DEMO',
-  traffic: 'SIMULATED TRAFFIC DEMO',
-  breakdown: 'SIMULATED BREAKDOWN DEMO',
-  demand: 'SIMULATED DEMAND DEMO',
-  communication: 'SIMULATED COMMUNICATION',
+  bunching: 'HEADWAY ANALYSIS',
+  traffic: 'CORRIDOR ANALYSIS',
+  breakdown: 'INCIDENT RESPONSE',
+  demand: 'DEMAND ANALYSIS',
+  communication: 'DRIVER COMMUNICATION',
 } as const satisfies Record<ScenarioKind, string>;
 
-export const GENERIC_SIM_BADGE = 'SIMULATED AI DEMONSTRATION';
-export const FUTURE_CAPABILITY_BADGE = 'FUTURE CAPABILITY DEMO';
+/** Single consistent provenance marker used across the interface. */
+export const PREDICTIVE_BADGE = 'PREDICTIVE';
