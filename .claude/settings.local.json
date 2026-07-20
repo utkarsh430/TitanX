@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Bash(sed -E 's/=.*/=<redacted>/' .env.local)",
+      "Bash(curl -s -m 25 -w \"\\\\nHTTP_STATUS:%{http_code}\\\\nCONTENT_TYPE:%{content_type}\\\\nSIZE:%{size_download}\\\\n\" -o /tmp/live.raw \"https://margdarshi.upsrtcvlt.com/php/getGpsLiveData.php\")",
+      "Read(//tmp/**)",
+      "Bash(node -e ' *)",
+      "Bash(npx --yes create-next-app@15.1.6 upsrtc-tmp --ts --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack --use-npm --yes)",
+      "Bash(rm -rf upsrtc-tmp/.git)",
+      "Bash(mv upsrtc-tmp/.gitignore .)",
+      "Bash(mv upsrtc-tmp/* .)",
+      "Bash(rmdir upsrtc-tmp *)",
+      "Bash(npm install *)",
+      "Bash(npm audit *)",
+      "Bash(npm uninstall *)",
+      "Bash(node -p \"const p=require\\('./package.json'\\);JSON.stringify\\({...p.dependencies,...p.devDependencies},null,1\\)\")",
+      "Bash(npm run *)",
+      "Bash(npx tsc *)",
+      "Bash(npx tsx -e ' *)",
+      "Bash(curl -s -m 30 \"http://127.0.0.1:3000/api/upsrtc/live\" -o /tmp/l2.json -w \"time=%{time_total}s\\\\n\")",
+      "Bash(node -e \"const d=require\\('/tmp/l2.json'\\);console.log\\('source:',d.source,'stale:',d.stale\\)\")",
+      "Bash(curl -s -m 30 http://127.0.0.1:3000/api/upsrtc/schedule?regNum=__TRACKED_VAR__)",
+      "Bash(curl -s -m 20 \"http://127.0.0.1:3000/api/upsrtc/schedule?regNum=DROP%20TABLE\" -w \" status=%{http_code}\\\\n\")",
+      "Bash(curl -s -m 40 \"http://127.0.0.1:3000/api/upsrtc/live\" -o /dev/null -w \"size=%{size_download} bytes\\\\n\")",
+      "Bash(curl -s -m 40 -H \"Accept-Encoding: gzip\" \"http://127.0.0.1:3000/api/upsrtc/live\" -o /dev/null -w \"size=%{size_download} bytes encoding=%{content_type}\\\\n\")",
+      "Bash(curl -s -m 40 -H \"Accept-Encoding: br, gzip\" -D- \"http://127.0.0.1:3000/api/upsrtc/live\" -o /dev/null)",
+      "Bash(npx playwright *)",
+      "Bash(cp /tmp/shot.mjs ./shot.mjs)",
+      "Bash(node ./shot.mjs)"
+    ]
+  }
+}
