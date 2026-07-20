@@ -47,8 +47,11 @@
 
 @layer components {
   /* Frosted holographic panel — the core surface of the command centre. */
+  /* NOTE: deliberately no backdrop-filter. These panels overlay a live map,
+     so a blur layer can never be cached and re-samples every frame. An opaque
+     background is visually equivalent here and dramatically cheaper. */
   .hud-panel {
-    @apply relative rounded-lg border border-holo-glow/20 bg-[rgba(6,14,28,0.72)] backdrop-blur-xl;
+    @apply relative rounded-lg border border-holo-glow/20 bg-[rgb(7,15,29)];
     box-shadow:
       0 0 0 1px rgba(63, 240, 255, 0.06),
       0 18px 50px -22px rgba(0, 0, 0, 0.9),
@@ -56,7 +59,7 @@
   }
 
   .hud-panel-strong {
-    @apply relative rounded-lg border border-holo-glow/35 bg-[rgba(6,14,28,0.78)] backdrop-blur-xl;
+    @apply relative rounded-lg border border-holo-glow/35 bg-[rgb(8,17,32)];
     box-shadow:
       0 0 0 1px rgba(63, 240, 255, 0.18),
       0 0 34px -10px rgba(63, 240, 255, 0.4),

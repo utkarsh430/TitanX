@@ -27,7 +27,8 @@
       "Bash(curl -s -m 40 -H \"Accept-Encoding: br, gzip\" -D- \"http://127.0.0.1:3000/api/upsrtc/live\" -o /dev/null)",
       "Bash(npx playwright *)",
       "Bash(cp /tmp/shot.mjs ./shot.mjs)",
-      "Bash(node ./shot.mjs)"
+      "Bash(node ./shot.mjs)",
+      "Bash(python3 -)"
     ]
   }
 }

@@ -2,43 +2,20 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { MarkerClusterer, type Marker } from '@googlemaps/markerclusterer';
+import { createFleetLayer, type FleetLayerHandle } from './fleetCanvasLayer';
 import { useCopilotStore, useSelectedBus } from '@/stores/copilotStore';
 import { MAP_DARK_STYLE, DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, SELECTED_BUS_ZOOM } from '@/lib/constants';
 import { MapFallback } from './MapFallback';
 import { RadarSweep } from './RadarSweep';
 import { useScenarioOverlays } from './useScenarioOverlays';
-import type { CanonicalLiveBus } from '@/models/canonical';
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
-
-/** Custom holographic bus marker, rotated to the reported heading. */
-function busMarkerIcon(bus: CanonicalLiveBus, selected: boolean): google.maps.Symbol {
-  const colour = selected
-    ? '#3ff0ff'
-    : bus.dataQuality === 'good'
-      ? '#2bff88'
-      : bus.dataQuality === 'degraded'
-        ? '#ffb020'
-        : '#ff4d5e';
-
-  return {
-    path: 'M 0,-9 L 5.4,7 L 0,3.4 L -5.4,7 Z',
-    fillColor: colour,
-    fillOpacity: selected ? 1 : 0.85,
-    strokeColor: colour,
-    strokeOpacity: selected ? 0.9 : 0.35,
-    strokeWeight: selected ? 2.4 : 1,
-    scale: selected ? 1.75 : 1.05,
-    rotation: bus.headingDegrees ?? 0,
-  };
-}
 
 export function FleetMap() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<Map<string, google.maps.Marker>>(new Map());
-  const clustererRef = useRef<MarkerClusterer | null>(null);
+  /** Single canvas overlay replaces ~9.5k individual map markers. */
+  const layerRef = useRef<FleetLayerHandle | null>(null);
 
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState('');
@@ -83,6 +60,18 @@ export function FleetMap() {
         });
 
         mapRef.current = map;
+
+        layerRef.current = createFleetLayer(map, (bus) => {
+          selectBus(bus.id);
+          logAudit('bus-selected', `Operator selected live bus ${bus.registrationNumber} from map`, {
+            registrationNumber: bus.registrationNumber,
+            simulated: false,
+          });
+        });
+        // Seed with whatever has already arrived from the feed.
+        layerRef.current.setBuses(useCopilotStore.getState().buses);
+        layerRef.current.setSelected(useCopilotStore.getState().selectedBusId);
+
         setMapInstance(map);
         setStatus('ready');
       })
@@ -96,101 +85,23 @@ export function FleetMap() {
 
     return () => {
       cancelled = true;
+      layerRef.current?.destroy();
+      layerRef.current = null;
     };
+    // selectBus/logAudit are stable Zustand actions; the map must build once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ---- Incremental marker sync --------------------------------------------
-  // Only create/remove/update what actually changed — the feed carries ~9.5k
-  // buses and a full rebuild every 15s would visibly stutter.
+  // ---- Fleet layer sync ---------------------------------------------------
+  // Handing the layer a new array is O(1); the redraw it schedules is
+  // O(visible vehicles) on the next animation frame.
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map || status !== 'ready') return;
+    layerRef.current?.setBuses(buses);
+  }, [buses]);
 
-    const existing = markersRef.current;
-    const seen = new Set<string>();
-    const added: google.maps.Marker[] = [];
-
-    for (const bus of buses) {
-      seen.add(bus.id);
-      const position = { lat: bus.latitude, lng: bus.longitude };
-      const current = existing.get(bus.id);
-
-      if (current) {
-        const previous = current.getPosition();
-        if (!previous || previous.lat() !== bus.latitude || previous.lng() !== bus.longitude) {
-          current.setPosition(position);
-        }
-        current.setIcon(busMarkerIcon(bus, bus.id === selectedBusId));
-        current.setZIndex(bus.id === selectedBusId ? 999 : 1);
-      } else {
-        const marker = new google.maps.Marker({
-          position,
-          icon: busMarkerIcon(bus, bus.id === selectedBusId),
-          title: bus.registrationNumber,
-          optimized: true,
-        });
-        marker.addListener('click', () => {
-          selectBus(bus.id);
-          logAudit('bus-selected', `Operator selected live bus ${bus.registrationNumber} from map`, {
-            registrationNumber: bus.registrationNumber,
-            simulated: false,
-          });
-        });
-        existing.set(bus.id, marker);
-        added.push(marker);
-      }
-    }
-
-    // Drop markers for buses that disappeared from the feed.
-    const removed: google.maps.Marker[] = [];
-    for (const [id, marker] of existing) {
-      if (!seen.has(id)) {
-        removed.push(marker);
-        existing.delete(id);
-      }
-    }
-
-    if (!clustererRef.current) {
-      clustererRef.current = new MarkerClusterer({
-        map,
-        markers: [...existing.values()],
-        renderer: {
-          // Kept deliberately compact: at the statewide overview zoom the
-          // fleet produces hundreds of clusters, and larger discs overlap
-          // into an unreadable mass.
-          render: ({ count, position }) => {
-            const scale = Math.min(17, 8 + Math.log2(count + 1) * 1.5);
-            return new google.maps.Marker({
-              position,
-              icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                fillColor: '#0b3a52',
-                fillOpacity: 0.82,
-                strokeColor: '#3ff0ff',
-                strokeOpacity: 0.9,
-                strokeWeight: 1.2,
-                scale,
-              },
-              label: {
-                text: String(count),
-                color: '#d9f6ff',
-                fontSize: scale > 13 ? '11px' : '9px',
-                fontFamily: 'monospace',
-                fontWeight: '600',
-              },
-              zIndex: 500,
-            });
-          },
-        },
-      });
-    } else {
-      if (removed.length > 0) clustererRef.current.removeMarkers(removed as Marker[], true);
-      if (added.length > 0) clustererRef.current.addMarkers(added as Marker[], true);
-      if (removed.length > 0 || added.length > 0) {
-        clustererRef.current.render();
-      }
-    }
-  }, [buses, selectedBusId, status, selectBus, logAudit]);
+  useEffect(() => {
+    layerRef.current?.setSelected(selectedBusId);
+  }, [selectedBusId]);
 
   // ---- Camera fly-to on selection -----------------------------------------
   // Runs on selection change only, so 15s polling never yanks the camera back.

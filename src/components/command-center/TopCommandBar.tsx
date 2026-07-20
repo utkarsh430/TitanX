@@ -33,7 +33,7 @@ export function TopCommandBar({
   }, [feedMeta]);
 
   return (
-    <header className="relative z-30 flex h-[62px] shrink-0 items-center gap-4 border-b border-holo-glow/20 bg-void-900/85 px-4 backdrop-blur-xl">
+    <header className="relative z-30 flex h-[62px] shrink-0 items-center gap-4 border-b border-holo-glow/20 bg-[rgb(5,11,23)] px-4">
       {/* Identity */}
       <div className="flex items-center gap-3">
         <div className="relative flex h-9 w-9 items-center justify-center">

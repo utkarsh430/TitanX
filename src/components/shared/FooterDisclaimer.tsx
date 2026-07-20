@@ -14,7 +14,7 @@ export function FooterDisclaimer() {
 
   return (
     <div
-      className="relative z-30 shrink-0 border-t border-holo-glow/15 bg-void-900/90 backdrop-blur-xl"
+      className="relative z-30 shrink-0 border-t border-holo-glow/15 bg-[rgb(5,11,23)]"
       data-testid="footer-disclaimer"
     >
       <button

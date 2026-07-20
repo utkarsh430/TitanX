@@ -91,7 +91,9 @@ export function BusDetailDrawer() {
   const quality = bus ? DATA_QUALITY_META[bus.dataQuality] : null;
 
   return (
-    <AnimatePresence>
+    // mode="wait" so switching buses quickly retires the outgoing drawer before
+    // the next mounts — otherwise two drawers stack in the same slot.
+    <AnimatePresence mode="wait">
       {bus && (
         <motion.aside
           key={bus.id}

@@ -14,6 +14,7 @@ export function RadarSweep({ map, bus }: { map: google.maps.Map; bus: CanonicalL
 
   useEffect(() => {
     let frame = 0;
+    let queued = false;
 
     const project = () => {
       const projection = map.getProjection();
@@ -45,10 +46,21 @@ export function RadarSweep({ map, bus }: { map: google.maps.Map; bus: CanonicalL
       setPoint({ x, y });
     };
 
+    // bounds_changed fires continuously while dragging. Coalescing to one
+    // projection per animation frame turns a re-render storm into 60/s max.
+    const scheduleProject = () => {
+      if (queued) return;
+      queued = true;
+      frame = requestAnimationFrame(() => {
+        queued = false;
+        project();
+      });
+    };
+
     const listeners = [
-      map.addListener('bounds_changed', project),
-      map.addListener('zoom_changed', project),
-      map.addListener('idle', project),
+      map.addListener('bounds_changed', scheduleProject),
+      map.addListener('zoom_changed', scheduleProject),
+      map.addListener('idle', scheduleProject),
     ];
 
     frame = requestAnimationFrame(project);

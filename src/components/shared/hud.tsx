@@ -109,29 +109,46 @@ export function CountUp({
   const fromRef = useRef(0);
 
   useEffect(() => {
-    if (reduced) {
+    const from = fromRef.current;
+
+    // Skip the animation entirely for reduced motion, the first paint, or a
+    // change too small to be perceptible. Polling nudges these counters every
+    // 15s, and a full rAF run per nudge re-rendered the whole command bar ~54
+    // times for a movement of one or two vehicles.
+    if (reduced || Math.abs(value - from) < 2) {
+      fromRef.current = value;
       setDisplay(value);
       return;
     }
 
-    const from = fromRef.current;
     const start = performance.now();
     const duration = 900;
+    let last = -1;
 
     const tick = (now: number) => {
       const progress = Math.min(1, (now - start) / duration);
-      // easeOutCubic
-      const eased = 1 - (1 - progress) ** 3;
-      setDisplay(from + (value - from) * eased);
+      const eased = 1 - (1 - progress) ** 3; // easeOutCubic
+      const next = from + (value - from) * eased;
+
+      // Only re-render when the displayed text would actually change.
+      const rounded = Number(next.toFixed(decimals));
+      if (rounded !== last) {
+        last = rounded;
+        setDisplay(next);
+      }
+
       if (progress < 1) frameRef.current = requestAnimationFrame(tick);
-      else fromRef.current = value;
+      else {
+        fromRef.current = value;
+        setDisplay(value);
+      }
     };
 
     frameRef.current = requestAnimationFrame(tick);
     return () => {
       if (frameRef.current !== undefined) cancelAnimationFrame(frameRef.current);
     };
-  }, [value, reduced]);
+  }, [value, reduced, decimals]);
 
   return (
     <span className={cn('tabular-nums', className)}>
@@ -268,12 +285,21 @@ export function Waveform({
           <motion.span
             key={index}
             className="w-[3px] rounded-full"
-            style={{ backgroundColor: color, opacity: active ? 0.85 : 0.25 }}
-            initial={{ height: `${base * 0.3}%` }}
+            style={{
+              backgroundColor: color,
+              opacity: active ? 0.85 : 0.25,
+              // Fixed box + transform-only animation. Animating `height` here
+              // forced a layout pass every frame for every bar, on a component
+              // that is mounted for the entire session.
+              height: '100%',
+              transformOrigin: 'bottom',
+              willChange: 'transform',
+            }}
+            initial={{ scaleY: base * 0.003 }}
             animate={
               reduced || !active
-                ? { height: `${base * 0.4}%` }
-                : { height: [`${base * 0.28}%`, `${base}%`, `${base * 0.42}%`] }
+                ? { scaleY: base * 0.004 }
+                : { scaleY: [base * 0.0028, base * 0.01, base * 0.0042] }
             }
             transition={
               reduced || !active
@@ -303,22 +329,24 @@ export function AmbientBackdrop() {
       <div className="absolute inset-0 scanline-overlay opacity-50" />
       <div className="noise-overlay absolute inset-0 opacity-[0.035] mix-blend-overlay" />
 
+      {/* Ambient particles. Kept few, transform/opacity only, and GPU-promoted:
+          this layer sits behind the entire app for the whole session. */}
       {!reduced &&
-        Array.from({ length: 18 }).map((_, index) => (
+        Array.from({ length: 8 }).map((_, index) => (
           <motion.span
             key={index}
             className="absolute h-1 w-1 rounded-full bg-holo-glow/40"
             style={{
               left: `${(index * 37) % 100}%`,
               top: `${(index * 61) % 100}%`,
-              filter: 'blur(0.5px)',
+              willChange: 'transform, opacity',
             }}
             animate={{ y: [0, -26, 0], opacity: [0.15, 0.55, 0.15] }}
             transition={{
-              duration: 7 + (index % 6),
+              duration: 9 + (index % 6),
               repeat: Infinity,
               ease: 'easeInOut',
-              delay: index * 0.4,
+              delay: index * 0.6,
             }}
           />
         ))}
