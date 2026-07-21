@@ -29,7 +29,7 @@ export const SEEDED_INCIDENT_KIND: AlertKind = 'breakdown';
 
 export const ALERT_KIND_LABELS: Record<AlertKind, string> = {
   bunching: 'Bunching',
-  traffic: 'Corridor',
+  traffic: 'Traffic',
   breakdown: 'Vehicle',
   demand: 'Demand',
 };
@@ -57,9 +57,9 @@ export interface FleetAlert {
 function alertTitle(kind: AlertKind, bus: CanonicalLiveBus): string {
   switch (kind) {
     case 'bunching':
-      return 'Bus bunching projected';
+      return 'Bus bunching detected';
     case 'traffic':
-      return 'Corridor congestion projected';
+      return 'Traffic congestion detected';
     case 'breakdown':
       return 'Vehicle fault signature detected';
     case 'demand':
