@@ -45,7 +45,10 @@
       "Bash(node ./shot.tmp.mjs)",
       "Bash(npx next *)",
       "Bash(git stash *)",
-      "Bash(pkill -f \"next dev\")"
+      "Bash(pkill -f \"next dev\")",
+      "Bash(git branch *)",
+      "Bash(git reset *)",
+      "Bash(git commit *)"
     ]
   }
 }
