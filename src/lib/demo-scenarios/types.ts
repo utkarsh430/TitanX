@@ -104,7 +104,7 @@ export interface ScenarioOverrides {
  * the standing footer notice, rather than repeated on every card.
  */
 export const SIMULATION_LABELS = {
-  bunching: 'HEADWAY ANALYSIS',
+  bunching: 'BUNCHING ANALYSIS',
   traffic: 'CORRIDOR ANALYSIS',
   breakdown: 'INCIDENT RESPONSE',
   demand: 'DEMAND ANALYSIS',

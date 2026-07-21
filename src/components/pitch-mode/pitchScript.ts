@@ -57,7 +57,7 @@ export const PITCH_STEPS: PitchStep[] = [
     id: 'bunching',
     caption: 'AI identifies the risk',
     detail:
-      'A headway projection shows two services converging on the same passenger stop.',
+      'A bunching projection shows two buses converging on the same passenger stop.',
     durationMs: 9000,
     action: { type: 'scenario', kind: 'bunching' },
   },

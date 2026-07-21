@@ -29,7 +29,7 @@ export const FUTURE_IMPACT_KPIS: ImpactKpi[] = [
     label: 'Bunching incidents',
     changePercent: -85,
     direction: 'reduction',
-    description: 'Projected reduction in service bunching incidents across managed corridors.',
+    description: 'Projected reduction in bus bunching incidents across managed corridors.',
     baseline: '100 incidents / week',
     projected: '15 incidents / week',
   },

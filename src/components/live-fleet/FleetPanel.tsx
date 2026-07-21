@@ -12,6 +12,25 @@ import { cn } from '@/lib/utils';
 
 const MAX_RENDERED = 160;
 
+/**
+ * Fleet list ordering, lowest first.
+ *
+ * Roughly a quarter of the ~9.5k vehicles carry a route assignment at any time,
+ * and most of the rest are parked, so unordered the list opens on a wall of
+ * stationary unassigned buses. Running services surface instead.
+ */
+function activityRank(bus: CanonicalLiveBus): number {
+  const onRoute = bus.routeName !== null;
+  // A stale record's speed is whatever it read when the GPS last reported,
+  // which can be days ago — that bus is not moving now, so it does not get to
+  // outrank vehicles the feed is actually tracking.
+  const moving = (bus.speedKmph ?? 0) > 0 && bus.dataQuality !== 'stale';
+  if (onRoute && moving) return 0;
+  if (onRoute) return 1;
+  if (moving) return 2;
+  return 3;
+}
+
 export function FleetPanel({ onVisibleCountChange }: { onVisibleCountChange: (n: number) => void }) {
   const buses = useCopilotStore((state) => state.buses);
   const filters = useCopilotStore((state) => state.filters);
@@ -45,12 +64,21 @@ export function FleetPanel({ onVisibleCountChange }: { onVisibleCountChange: (n:
 
   const filtered = useMemo(() => {
     const query = filters.search.trim().toUpperCase();
-    return buses.filter((bus) => {
+    const matches = buses.filter((bus) => {
       if (query && !bus.registrationNumber.toUpperCase().includes(query)) return false;
       if (filters.depot !== 'all' && bus.depotName !== filters.depot) return false;
       if (filters.route !== 'all' && bus.routeName !== filters.route) return false;
       if (filters.quality !== 'all' && bus.dataQuality !== filters.quality) return false;
       return true;
+    });
+
+    // Only the first MAX_RENDERED rows are ever painted, so ordering decides
+    // what an operator actually sees. A bus that is on a route and moving is
+    // the one worth watching; parked and unassigned vehicles sink. Ties break
+    // on registration so the list does not reshuffle under itself on each poll.
+    return matches.sort((a, b) => {
+      const rank = activityRank(a) - activityRank(b);
+      return rank !== 0 ? rank : a.registrationNumber.localeCompare(b.registrationNumber);
     });
   }, [buses, filters]);
 

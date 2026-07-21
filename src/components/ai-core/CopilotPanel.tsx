@@ -148,7 +148,7 @@ export function CopilotPanel() {
                 <div className="space-y-1">
                   <Channel label="Fleet telemetry ingest" status="live" detail="15s polling" />
                   <Channel label="Schedule retrieval" status="live" detail="on selection" />
-                  <Channel label="Headway analysis" status="model" detail="predictive" />
+                  <Channel label="Bunching analysis" status="model" detail="predictive" />
                   <Channel label="Corridor traffic model" status="model" detail="predictive" />
                   <Channel label="Vehicle health monitor" status="model" detail="predictive" />
                   <Channel label="Demand forecasting" status="model" detail="predictive" />
@@ -219,7 +219,7 @@ export function CopilotPanel() {
                 </p>
               </Section>
 
-              <Section title="Affected Services">
+              <Section title="Affected Buses">
                 <div className="flex flex-wrap gap-1.5">
                   {scenario.affectedBuses.map((bus) => {
                     const isReal = bus === selectedBus?.registrationNumber;

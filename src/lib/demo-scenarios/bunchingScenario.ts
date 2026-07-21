@@ -9,7 +9,7 @@ import {
 /**
  * Bus-bunching projection.
  *
- * The selected vehicle is real. The companion services are modelled markers
+ * The selected vehicle is real. The companion buses are modelled markers
  * placed relative to it — no headway mathematics is run against the live fleet.
  */
 
@@ -40,7 +40,7 @@ export function buildBunchingScenario(context: ScenarioContext): BunchingScenari
   const holdSeconds = overrides?.holdSeconds ?? 90;
   const minutesToBunching = random.int(6, 10);
 
-  // Companion services sit ahead of / behind the real bus along its heading.
+  // Companion buses sit ahead of / behind the real bus along its heading.
   const aheadKm = random.fixed(0.8, 1.6, 2);
   const behindKm = random.fixed(5.5, 8.5, 2);
 
@@ -49,8 +49,8 @@ export function buildBunchingScenario(context: ScenarioContext): BunchingScenari
 
   const markers: SimulatedBusMarker[] = [
     {
-      id: 'SIM-SERVICE-A',
-      label: 'SERVICE AHEAD',
+      id: 'SIM-BUS-A',
+      label: 'BUS AHEAD',
       role: 'ahead',
       headingDegrees: heading,
       isRealBus: false,
@@ -58,7 +58,7 @@ export function buildBunchingScenario(context: ScenarioContext): BunchingScenari
     },
     {
       id: bus.registrationNumber,
-      label: 'SELECTED SERVICE',
+      label: 'SELECTED BUS',
       role: 'selected',
       headingDegrees: heading,
       isRealBus: true,
@@ -66,8 +66,8 @@ export function buildBunchingScenario(context: ScenarioContext): BunchingScenari
       longitude: bus.longitude,
     },
     {
-      id: 'SIM-SERVICE-C',
-      label: 'SERVICE BEHIND',
+      id: 'SIM-BUS-C',
+      label: 'BUS BEHIND',
       role: 'behind',
       headingDegrees: heading,
       isRealBus: false,
@@ -97,16 +97,16 @@ export function buildBunchingScenario(context: ScenarioContext): BunchingScenari
   return {
     kind: 'bunching',
     simulationLabel: SIMULATION_LABELS.bunching,
-    headline: 'Service bunching projected on the scheduled corridor',
+    headline: 'Bus bunching projected on the scheduled corridor',
     severity: riskPercent >= 85 ? 'warning' : 'advisory',
     severityText: riskPercent >= 85 ? 'Warning — intervention advised' : 'Advisory — monitor closely',
     confidencePercent: Math.min(97, riskPercent + random.int(1, 5)),
     observation:
-      'The selected service is closing the gap with the preceding service while the following service remains significantly delayed. Without intervention, both services are projected to arrive together at the next major passenger stop.',
+      'The selected bus is closing the gap with the bus ahead while the bus behind remains significantly delayed. Without intervention, both buses are projected to arrive together at the next major passenger stop.',
     recommendation: `Hold the selected bus for ${holdSeconds} seconds at the next authorized bus station.`,
     expectedOutcome: `Forward gap recovers from ${gapAheadMinutes} minutes to approximately ${projectedGapAheadAfter} minutes, restoring a more even headway across ${routeLabel}.`,
-    affectedBuses: ['SERVICE AHEAD', bus.registrationNumber, 'SERVICE BEHIND'],
-    suggestedDriverMessageEn: `Please hold at the next authorized bus station for approximately ${holdSeconds} seconds to restore service spacing. Await control-room confirmation before departing.`,
+    affectedBuses: ['BUS AHEAD', bus.registrationNumber, 'BUS BEHIND'],
+    suggestedDriverMessageEn: `Please hold at the next authorized bus station for approximately ${holdSeconds} seconds to restore spacing between buses. Await control-room confirmation before departing.`,
     suggestedDriverMessageHi: `कृपया सेवा अंतराल ठीक करने के लिए अगले अधिकृत बस स्टेशन पर लगभग ${holdSeconds} सेकंड रुकें। प्रस्थान से पहले नियंत्रण कक्ष की पुष्टि की प्रतीक्षा करें।`,
     actions: [
       { id: 'accept', label: 'Accept Suggestion', kind: 'accept' },

@@ -7,7 +7,7 @@ import { CountUp } from '@/components/shared/hud';
 import type { BunchingScenario } from '@/lib/demo-scenarios/bunchingScenario';
 import { cn } from '@/lib/utils';
 
-/** Bunching visualisation — headway geometry and projected recovery. */
+/** Bunching visualisation — bus spacing geometry and projected recovery. */
 export function BunchingStage({ scenario }: { scenario: BunchingScenario }) {
   const [accepted, setAccepted] = useState(false);
 
@@ -19,7 +19,7 @@ export function BunchingStage({ scenario }: { scenario: BunchingScenario }) {
       <div className="flex items-center justify-between">
         <h3 className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-holo-glow">
           <GitMerge className="h-3.5 w-3.5" aria-hidden />
-          Headway Analysis
+          Bunching Analysis
         </h3>
 <span className="rounded border border-holo-teal/40 bg-holo-teal/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.14em] text-holo-teal">
           Predictive
@@ -31,11 +31,11 @@ export function BunchingStage({ scenario }: { scenario: BunchingScenario }) {
         <div className="absolute inset-x-6 top-1/2 h-[2px] -translate-y-1/2 bg-gradient-to-r from-holo-glow/10 via-holo-glow/45 to-holo-glow/10" />
 
         <div className="relative flex items-center justify-between">
-          <ServiceNode label="SERVICE AHEAD" sublabel="Preceding service" tone="amber" />
+          <BusNode label="BUS AHEAD" sublabel="Preceding bus" tone="amber" />
           <GapIndicator minutes={gapAhead} label="Gap ahead" critical={gapAhead < 6} />
-          <ServiceNode label="SELECTED SERVICE" sublabel="Live UPSRTC vehicle" tone="live" pulse />
+          <BusNode label="SELECTED BUS" sublabel="Live UPSRTC vehicle" tone="live" pulse />
           <GapIndicator minutes={gapBehind} label="Gap behind" critical={false} wide />
-          <ServiceNode label="SERVICE BEHIND" sublabel="Following service" tone="amber" />
+          <BusNode label="BUS BEHIND" sublabel="Following bus" tone="amber" />
         </div>
       </div>
 
@@ -114,7 +114,7 @@ export function BunchingStage({ scenario }: { scenario: BunchingScenario }) {
   );
 }
 
-function ServiceNode({
+function BusNode({
   label,
   sublabel,
   tone,

@@ -35,7 +35,7 @@ export const SCENARIO_TITLES: Record<ScenarioKind, string> = {
 };
 
 export const SCENARIO_FULL_LABELS: Record<ScenarioKind, string> = {
-  bunching: 'HEADWAY OPTIMIZATION',
+  bunching: 'BUNCHING OPTIMIZATION',
   traffic: 'CORRIDOR TRAFFIC INTELLIGENCE',
   breakdown: 'BREAKDOWN RESPONSE COORDINATION',
   demand: 'DEMAND AND FLEET REDISTRIBUTION',

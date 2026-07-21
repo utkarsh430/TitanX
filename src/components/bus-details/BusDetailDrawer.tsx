@@ -35,7 +35,7 @@ const ANALYSIS_ACTIONS: Array<{
   icon: typeof GitMerge;
   testId: string;
 }> = [
-  { kind: 'bunching', label: 'Headway Analysis', detail: 'Service spacing on this corridor', icon: GitMerge, testId: 'analysis-bunching' },
+  { kind: 'bunching', label: 'Bunching Analysis', detail: 'Bus spacing on this corridor', icon: GitMerge, testId: 'analysis-bunching' },
   { kind: 'traffic', label: 'Corridor Conditions', detail: 'Congestion and route options ahead', icon: TrafficCone, testId: 'analysis-traffic' },
   { kind: 'breakdown', label: 'Incident Response', detail: 'Assistance coordination options', icon: Wrench, testId: 'analysis-breakdown' },
   { kind: 'demand', label: 'Demand Profile', detail: 'Loading and fleet distribution', icon: Users, testId: 'analysis-demand' },

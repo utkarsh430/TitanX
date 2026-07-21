@@ -99,7 +99,7 @@ test.describe('UPSRTC AI Operations Copilot', () => {
     expect(scheduleRequests[0]).toContain('regNum=');
   });
 
-  test('5. headway analysis opens with projected companion services', async ({ page }) => {
+  test('5. bunching analysis opens with projected companion buses', async ({ page }) => {
     await page.goto('/');
     await selectFirstBus(page);
 
@@ -108,10 +108,10 @@ test.describe('UPSRTC AI Operations Copilot', () => {
     const stage = page.getByTestId('scenario-stage');
     await expect(stage).toBeVisible({ timeout: 20_000 });
     await expect(page.getByTestId('bunching-stage')).toBeVisible();
-    await expect(stage.getByText('HEADWAY ANALYSIS').first()).toBeVisible();
-    await expect(stage.getByText('SELECTED SERVICE')).toBeVisible();
-    await expect(stage.getByText('SERVICE AHEAD')).toBeVisible();
-    await expect(stage.getByText('SERVICE BEHIND')).toBeVisible();
+    await expect(stage.getByText('BUNCHING ANALYSIS').first()).toBeVisible();
+    await expect(stage.getByText('SELECTED BUS')).toBeVisible();
+    await expect(stage.getByText('BUS AHEAD')).toBeVisible();
+    await expect(stage.getByText('BUS BEHIND')).toBeVisible();
   });
 
   test('6. corridor analysis opens with route comparison', async ({ page }) => {
