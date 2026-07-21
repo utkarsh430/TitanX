@@ -267,20 +267,78 @@ const STOP_ID_ALIASES = ['atco_code', 'stop_id', 'stopId', 'code'] as const;
 const STOP_TIME_ALIASES = ['scheduled_time', 'scheduledTime', 'arrival_time', 'eta'] as const;
 
 /**
- * Normalize the schedule payload.
+ * Group rows by vehicle journey.
+ *
+ * The endpoint answers with every journey the bus runs that day, not the one it
+ * is currently on — nine trips in a single response is normal — and each trip
+ * restarts stop_sequence at 1.
+ */
+function groupByTrip(rows: Rec[]): Map<string, Rec[]> {
+  const trips = new Map<string, Rec[]>();
+  for (const row of rows) {
+    const key = toStringOrNull(pick(row, TRIP_ALIASES)) ?? 'unknown';
+    const bucket = trips.get(key);
+    if (bucket) bucket.push(row);
+    else trips.set(key, [row]);
+  }
+  return trips;
+}
+
+/** Earliest scheduled time in a trip. HH:MM:SS strings order correctly as text. */
+function firstScheduledTime(rows: Rec[]): string {
+  let earliest = '99:99:99';
+  for (const row of rows) {
+    const time = toStringOrNull(pick(row, STOP_TIME_ALIASES));
+    if (time && time < earliest) earliest = time;
+  }
+  return earliest;
+}
+
+/**
+ * Pick the journey the bus is actually running.
+ *
+ * The live feed's vehicle_journey_id identifies it exactly and joins to vj_id
+ * here. Without that hint the earliest-departing trip is used, which is at
+ * least stable rather than dependent on upstream row order.
+ */
+function selectTrip(trips: Map<string, Rec[]>, preferredTripId?: string | null): Rec[] | null {
+  if (preferredTripId) {
+    const match = trips.get(preferredTripId);
+    if (match) return match;
+  }
+
+  let earliest: { rows: Rec[]; time: string } | null = null;
+  for (const rows of trips.values()) {
+    const time = firstScheduledTime(rows);
+    if (!earliest || time < earliest.time) earliest = { rows, time };
+  }
+  return earliest?.rows ?? null;
+}
+
+/**
+ * Normalize the schedule payload down to the single journey being run.
  *
  * IMPORTANT upstream quirk: when a bus has no assignment for the requested
  * date the endpoint returns a bare JSON *string* (e.g. `" Bus Not Assigned!!! "`)
  * with HTTP 200 rather than an error. extractArray yields [] for that shape,
  * so we surface it as "no schedule found" rather than a crash.
+ *
+ * The second quirk is the multi-trip response described on groupByTrip. Merging
+ * those trips yields a fictitious journey whose origin and destination come
+ * from two unrelated services — often reversed — so exactly one trip is kept.
  */
 export function normalizeSchedulePayload(
   payload: unknown,
   registrationNumber: string,
   date: string,
+  preferredTripId?: string | null,
 ): CanonicalSchedule | null {
-  const rows = extractArray(payload).filter(isRecord);
-  if (rows.length === 0) return null;
+  const allRows = extractArray(payload).filter(isRecord);
+  if (allRows.length === 0) return null;
+
+  const trips = groupByTrip(allRows);
+  const rows = selectTrip(trips, preferredTripId);
+  if (!rows || rows.length === 0) return null;
 
   const stops: CanonicalStop[] = rows
     .map((row, index) => {
@@ -303,6 +361,15 @@ export function normalizeSchedulePayload(
       };
     })
     .sort((a, b) => a.sequence - b.sequence);
+
+  // Upstream can still repeat an (atco_code, stop_sequence) pair inside a single
+  // journey. These ids are used as React keys, so any collision has to be broken.
+  const idCounts = new Map<string, number>();
+  for (const stop of stops) {
+    const seen = idCounts.get(stop.id) ?? 0;
+    idCounts.set(stop.id, seen + 1);
+    if (seen > 0) stop.id = `${stop.id}#${seen + 1}`;
+  }
 
   const first = rows[0] as Rec;
   const firstStop = stops[0];
@@ -333,6 +400,7 @@ export function normalizeSchedulePayload(
     scheduledArrival: lastStop?.scheduledArrival ?? null,
     // Upstream encodes direction as the _IN / _OUT suffix on the route name.
     direction: routeName?.endsWith('_IN') ? 'IN' : routeName?.endsWith('_OUT') ? 'OUT' : null,
+    tripCount: trips.size,
     stops,
   };
 }

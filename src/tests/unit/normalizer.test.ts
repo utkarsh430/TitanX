@@ -307,6 +307,75 @@ describe('schedule normalization', () => {
     expect(schedule?.stops.map((stop) => stop.sequence)).toEqual([1, 2, 3]);
   });
 
+  describe('multi-trip responses', () => {
+    /**
+     * A real day's response for one bus: several vehicle journeys concatenated,
+     * each restarting stop_sequence at 1.
+     */
+    const secondTrip = [
+      {
+        vj_id: 44286,
+        atco_code: 19001,
+        stop_sequence: 1,
+        stop_name: 'RUDRAPUR',
+        RouteName: 'RKD_4560_ORD_IN',
+        route_description: 'RUDRAPUR TO BAREILLY OLD BUS STATION',
+        scheduled_time: '14:10:00',
+        Latitude: 28.98,
+        Longitude: 79.4,
+      },
+      {
+        vj_id: 44286,
+        atco_code: 14035,
+        stop_sequence: 2,
+        stop_name: 'BAREILLY OLD BUS STATION',
+        RouteName: 'RKD_4560_ORD_IN',
+        route_description: 'RUDRAPUR TO BAREILLY OLD BUS STATION',
+        scheduled_time: '16:40:00',
+        Latitude: 28.358965,
+        Longitude: 79.41976,
+      },
+    ];
+    const wholeDay = [...upstreamStops, ...secondTrip];
+
+    it('returns only the journey matching the live trip id', () => {
+      const schedule = normalizeSchedulePayload(wholeDay, 'UP25FT4823', '2026-07-20', '44286');
+      expect(schedule?.stops).toHaveLength(2);
+      expect(schedule?.originName).toBe('RUDRAPUR');
+      expect(schedule?.destinationName).toBe('BAREILLY OLD BUS STATION');
+      expect(schedule?.direction).toBe('IN');
+      expect(schedule?.tripCount).toBe(2);
+    });
+
+    it('does not merge trips into one fictitious journey', () => {
+      // Merging would yield 5 stops and an origin/destination spanning both.
+      const schedule = normalizeSchedulePayload(wholeDay, 'UP25FT4823', '2026-07-20', '30396');
+      expect(schedule?.stops).toHaveLength(3);
+      expect(schedule?.scheduledDeparture).toBe('10:06:00');
+      expect(schedule?.scheduledArrival).toBe('10:51:28');
+    });
+
+    it('falls back to the earliest-departing trip when the id is unknown', () => {
+      for (const hint of [undefined, null, '99999']) {
+        const schedule = normalizeSchedulePayload(wholeDay, 'UP25FT4823', '2026-07-20', hint);
+        expect(schedule?.stops, `hint ${String(hint)}`).toHaveLength(3);
+        expect(schedule?.scheduledDeparture).toBe('10:06:00');
+      }
+    });
+
+    it('reports a single trip as tripCount 1', () => {
+      const schedule = normalizeSchedulePayload(upstreamStops, 'UP25FT4823', '2026-07-20');
+      expect(schedule?.tripCount).toBe(1);
+    });
+
+    it('keeps stop ids unique when upstream repeats a sequence within a trip', () => {
+      const duplicated = [upstreamStops[0], upstreamStops[0], upstreamStops[1]];
+      const schedule = normalizeSchedulePayload(duplicated, 'UP25FT4823', '2026-07-20');
+      const ids = schedule?.stops.map((stop) => stop.id) ?? [];
+      expect(new Set(ids).size, `ids: ${ids.join()}`).toBe(ids.length);
+    });
+  });
+
   it('returns null for the upstream "Bus Not Assigned" response', () => {
     expect(normalizeSchedulePayload(' Bus Not Assigned!!! ', 'UP78KT8662', '2026-07-20')).toBeNull();
   });

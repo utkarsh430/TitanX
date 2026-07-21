@@ -223,6 +223,11 @@ export function BusDetailDrawer() {
                     <summary className="cursor-pointer list-none px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-holo-glow/60 hover:text-holo-glow">
                       <Clock className="mr-1.5 inline h-3 w-3" aria-hidden />
                       Stop sequence ({schedule.stops.length} stops)
+                      {schedule.tripCount > 1 && (
+                        <span className="ml-1.5 text-holo-glow/35">
+                          · current trip of {schedule.tripCount} today
+                        </span>
+                      )}
                     </summary>
                     <ol className="max-h-52 overflow-y-auto border-t border-holo-glow/10">
                       {schedule.stops.map((stop) => (

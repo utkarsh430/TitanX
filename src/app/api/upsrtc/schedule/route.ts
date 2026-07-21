@@ -55,6 +55,8 @@ const querySchema = z.object({
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD')
     .optional(),
+  /** Live vehicle_journey_id, used to pick the running trip out of the day's list. */
+  tripId: z.string().min(1).max(32).optional(),
 });
 
 export async function GET(request: NextRequest): Promise<Response> {
@@ -64,6 +66,7 @@ export async function GET(request: NextRequest): Promise<Response> {
   const parsed = querySchema.safeParse({
     regNum: searchParams.get('regNum') ?? '',
     date: searchParams.get('date') ?? undefined,
+    tripId: searchParams.get('tripId') ?? undefined,
   });
 
   if (!parsed.success) {
@@ -79,7 +82,9 @@ export async function GET(request: NextRequest): Promise<Response> {
   const regNum = parsed.data.regNum.toUpperCase();
   const today = indiaDate();
   const requestedDate = parsed.data.date ?? today;
-  const cacheKey = `${regNum}:${requestedDate}`;
+  const tripId = parsed.data.tripId ?? null;
+  // The trip id selects which journey is returned, so it belongs in the key.
+  const cacheKey = `${regNum}:${requestedDate}:${tripId ?? '-'}`;
   const now = Date.now();
 
   scheduleDiagnostics.requestCount += 1;
@@ -100,7 +105,7 @@ export async function GET(request: NextRequest): Promise<Response> {
   }
 
   scheduleDiagnostics.lastAttemptAt = new Date(now).toISOString();
-  const lookup = await resolveSchedule(regNum, requestedDate, today);
+  const lookup = await resolveSchedule(regNum, requestedDate, today, tripId);
 
   if (lookup.found) {
     cache.set(cacheKey, lookup.found, now);
@@ -150,10 +155,18 @@ interface ResolveResult {
   error: string | null;
 }
 
-async function probe(regNum: string, date: string, timeoutMs: number): Promise<ScheduleLookup | string> {
+async function probe(
+  regNum: string,
+  date: string,
+  timeoutMs: number,
+  tripId: string | null,
+): Promise<ScheduleLookup | string> {
   const result = await fetchUpstream(buildScheduleUrl(regNum, date), timeoutMs);
   if (!result.ok) return result.error ?? 'Unknown upstream failure';
-  return { schedule: normalizeSchedulePayload(result.payload, regNum, date), resolvedDate: date };
+  return {
+    schedule: normalizeSchedulePayload(result.payload, regNum, date, tripId),
+    resolvedDate: date,
+  };
 }
 
 /**
@@ -167,16 +180,17 @@ async function resolveSchedule(
   regNum: string,
   requestedDate: string,
   today: string,
+  tripId: string | null,
 ): Promise<ResolveResult> {
   const [primary = requestedDate, ...fallbacks] = candidateDates(requestedDate, today);
   let error: string | null = null;
 
-  const first = await probe(regNum, primary, SCHEDULE_TIMEOUT_MS);
+  const first = await probe(regNum, primary, SCHEDULE_TIMEOUT_MS, tripId);
   if (typeof first === 'string') error = first;
   else if (first.schedule) return { found: first, error: null };
 
   const rest = await Promise.all(
-    fallbacks.map((date) => probe(regNum, date, SCHEDULE_TIMEOUT_MS)),
+    fallbacks.map((date) => probe(regNum, date, SCHEDULE_TIMEOUT_MS, tripId)),
   );
 
   for (const outcome of rest) {

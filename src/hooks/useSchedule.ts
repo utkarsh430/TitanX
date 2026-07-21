@@ -18,6 +18,13 @@ export function useSchedule(): void {
   const tripDate = useCopilotStore(
     (state) => state.buses.find((bus) => bus.id === state.selectedBusId)?.tripDate ?? null,
   );
+  /**
+   * A day's response lists every journey the bus runs, each restarting its stop
+   * sequence at 1. The live vehicle_journey_id picks out the one it is on.
+   */
+  const tripId = useCopilotStore(
+    (state) => state.buses.find((bus) => bus.id === state.selectedBusId)?.tripId ?? null,
+  );
   const setSchedule = useCopilotStore((state) => state.setSchedule);
   const setLoadingSchedule = useCopilotStore((state) => state.setLoadingSchedule);
   const logAudit = useCopilotStore((state) => state.logAudit);
@@ -38,6 +45,7 @@ export function useSchedule(): void {
       try {
         const query = new URLSearchParams({ regNum: selectedBusId as string });
         if (tripDate) query.set('date', tripDate);
+        if (tripId) query.set('tripId', tripId);
 
         const response = await fetch(`/api/upsrtc/schedule?${query.toString()}`, {
           signal: controller.signal,
@@ -67,5 +75,5 @@ export function useSchedule(): void {
       cancelled = true;
       controller.abort();
     };
-  }, [selectedBusId, tripDate, setSchedule, setLoadingSchedule, logAudit]);
+  }, [selectedBusId, tripDate, tripId, setSchedule, setLoadingSchedule, logAudit]);
 }

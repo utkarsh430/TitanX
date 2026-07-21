@@ -58,6 +58,11 @@ export const canonicalScheduleSchema = z.object({
   scheduledDeparture: z.string().nullable(),
   scheduledArrival: z.string().nullable(),
   direction: z.string().nullable(),
+  /**
+   * How many journeys the upstream listed for this bus on this date. The
+   * schedule above describes one of them — the one the vehicle is running.
+   */
+  tripCount: z.number(),
   stops: z.array(canonicalStopSchema),
 });
 export type CanonicalSchedule = z.infer<typeof canonicalScheduleSchema>;
