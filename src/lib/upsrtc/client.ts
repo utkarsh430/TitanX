@@ -88,6 +88,12 @@ export function indiaDate(now: Date = new Date()): string {
   return formatter.format(now);
 }
 
+/** Shift a YYYY-MM-DD date string by whole days, staying on the calendar grid. */
+export function shiftDate(date: string, days: number): string {
+  const [year = 1970, month = 1, day = 1] = date.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+}
+
 /** UPSRTC registration numbers look like UP77AN2509. */
 export function isValidRegistrationNumber(value: string): boolean {
   return /^[A-Z]{2}[0-9]{1,2}[A-Z]{0,3}[0-9]{1,4}$/i.test(value.trim());

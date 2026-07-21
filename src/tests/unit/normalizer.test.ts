@@ -116,6 +116,43 @@ describe('live payload normalization', () => {
     expect(bus.rawStatus).toBe('Live');
   });
 
+  describe('ignition', () => {
+    it('reports ON for a moving bus even when the ignition line says otherwise', () => {
+      const { buses } = normalizeLivePayload([upstreamBus({ speed: 34.2, ignition: 0 })]);
+      expect(buses[0]?.ignitionOn).toBe(true);
+    });
+
+    it('leaves a stationary bus reporting its own ignition state', () => {
+      const off = normalizeLivePayload([upstreamBus({ speed: 0, ignition: 0 })]);
+      expect(off.buses[0]?.ignitionOn).toBe(false);
+
+      // Idling at a stand: stopped, but the engine is genuinely running.
+      const idling = normalizeLivePayload([upstreamBus({ speed: 0, ignition: 1 })]);
+      expect(idling.buses[0]?.ignitionOn).toBe(true);
+    });
+
+    it('stays unknown when a stationary bus reports no ignition at all', () => {
+      const { buses } = normalizeLivePayload([upstreamBus({ speed: 0, ignition: null })]);
+      expect(buses[0]?.ignitionOn).toBeNull();
+    });
+  });
+
+  describe('trip date', () => {
+    it('takes the operating date from scheduled_start_time', () => {
+      const { buses } = normalizeLivePayload([
+        upstreamBus({ scheduled_start_time: '2026-07-19T22:40:00Z' }),
+      ]);
+      // Read literally: the Z suffix is a lie, the value is already IST, and
+      // parsing it would slide a late departure onto the following day.
+      expect(buses[0]?.tripDate).toBe('2026-07-19');
+    });
+
+    it('is null when the vehicle carries no assignment', () => {
+      const { buses } = normalizeLivePayload([upstreamBus({ scheduled_start_time: 'None' })]);
+      expect(buses[0]?.tripDate).toBeNull();
+    });
+  });
+
   it('supports registration-number aliases', () => {
     const aliases = [
       'reg_num', 'registration_number', 'registrationNo', 'vehicle_no',

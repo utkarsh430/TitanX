@@ -31,7 +31,7 @@ export function AlertToasts() {
 
   return (
     <div
-      className="pointer-events-none absolute right-3 top-3 z-[45] flex w-[330px] flex-col gap-2"
+      className="pointer-events-none absolute left-1/2 top-3 z-[45] flex w-[330px] -translate-x-1/2 flex-col items-stretch gap-2"
       aria-live="polite"
       aria-label="Incoming alerts"
     >
@@ -80,9 +80,9 @@ function Toast({ alert }: { alert: FleetAlert }) {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, x: 40, scale: 0.96 }}
-      animate={{ opacity: 1, x: 0, scale: 1 }}
-      exit={{ opacity: 0, x: 40, scale: 0.96 }}
+      initial={{ opacity: 0, y: -24, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -24, scale: 0.96 }}
       transition={{ type: 'spring', stiffness: 320, damping: 30 }}
       className={cn(
         'hud-panel-strong hud-corners pointer-events-auto relative overflow-hidden border',

@@ -49,6 +49,11 @@ const TRIP_ALIASES = ['vehicle_journey_id', 'trip_id', 'tripId', 'vj_id'] as con
 const TIMESTAMP_ALIASES = ['timestamp', 'receivedTime', 'gps_timestamp', 'gpsTimestamp', 'time'] as const;
 const STATUS_ALIASES = ['status', 'vehicle_status', 'vehicleStatus', 'packetStatus'] as const;
 const VEHICLE_TYPE_ALIASES = ['vehicle_type', 'vehicleType', 'service_type', 'bus_type'] as const;
+const TRIP_START_ALIASES = [
+  'scheduled_start_time',
+  'scheduledStartTime',
+  'trip_start_time',
+] as const;
 
 type Rec = Record<string, unknown>;
 
@@ -118,6 +123,19 @@ export function classifyDataQuality(gpsTimestamp: string | null, now: number = D
   if (ageMinutes <= 5) return 'good';
   if (ageMinutes <= 30) return 'degraded';
   return 'stale';
+}
+
+/**
+ * Operating date of the vehicle's current assignment, as YYYY-MM-DD.
+ *
+ * Upstream stamps scheduled_start_time with a Z suffix but the value is already
+ * IST, so the date part is taken literally rather than through Date — parsing
+ * it would slide an early-morning departure back onto the previous day.
+ */
+export function extractTripDate(value: unknown): string | null {
+  const raw = toStringOrNull(value);
+  if (!raw) return null;
+  return /^(\d{4}-\d{2}-\d{2})/.exec(raw)?.[1] ?? null;
 }
 
 function toBooleanOrNull(value: unknown): boolean | null {
@@ -214,8 +232,14 @@ export function normalizeLivePayload(payload: unknown, now: number = Date.now())
       vehicleType: toStringOrNull(pick(row, VEHICLE_TYPE_ALIASES)),
       gpsTimestamp,
       lastUpdatedAt: new Date(now).toISOString(),
-      ignitionOn: toBooleanOrNull(row['ignition']),
+      // A vehicle reporting road speed is running, whatever the ignition line
+      // says: a good number of VLT units report ignition 0 while the bus is
+      // plainly in motion, and showing OFF beside a live speed reads as a bug
+      // to the control room. Speed is only allowed to force ON, never OFF —
+      // a stationary bus idling at a stand still reports ignition honestly.
+      ignitionOn: speed !== null && speed > 0 ? true : toBooleanOrNull(row['ignition']),
       rawStatus: toStringOrNull(pick(row, STATUS_ALIASES)),
+      tripDate: extractTripDate(pick(row, TRIP_START_ALIASES)),
       dataQuality: classifyDataQuality(gpsTimestamp, now),
     };
 

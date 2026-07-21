@@ -1,4 +1,4 @@
-import type { CanonicalLiveBus } from '@/models/canonical';
+import type { CanonicalLiveBus, DataQuality } from '@/models/canonical';
 
 /**
  * Canvas overlay for the live fleet.
@@ -10,34 +10,66 @@ import type { CanonicalLiveBus } from '@/models/canonical';
  *
  * This layer draws every vehicle into a single canvas. Redraw is O(visible)
  * with no DOM churn, so pan/zoom stays on the compositor and the main thread
- * stays free. Clustering is done in screen space, which is both cheaper and
- * more stable visually than geographic clustering.
+ * stays free.
+ *
+ * Every vehicle is drawn at its own position — there is no clustering, so a
+ * dense corridor reads as dense. Two things keep that affordable at ~9.5k
+ * markers: chevrons are accumulated into one Path2D per colour and filled in a
+ * single call, and positions are projected with local Mercator maths rather
+ * than ~9.5k round trips through the Maps projection API.
  */
 
-const QUALITY_COLOUR: Record<CanonicalLiveBus['dataQuality'], string> = {
+const QUALITY_COLOUR: Record<DataQuality, string> = {
   good: '#2bff88',
   degraded: '#ffb020',
   stale: '#ff4d5e',
 };
 
+const QUALITIES: DataQuality[] = ['good', 'degraded', 'stale'];
+
 const SELECTED_COLOUR = '#3ff0ff';
 
-/** Screen-space grid cell size, in CSS pixels. */
-const CELL_PX = 46;
+/** Google's world is 256px square at zoom 0; all projection maths derives from this. */
+const TILE_SIZE = 256;
 
-interface Cell {
-  count: number;
-  sumX: number;
-  sumY: number;
-  bus: CanonicalLiveBus;
-  x: number;
-  y: number;
-}
+/** Chevron geometry at scale 1, in CSS pixels, nose pointing up. */
+const NOSE_Y = -7;
+const WING_X = 4.4;
+const WING_Y = 5.6;
+const TAIL_Y = 2.8;
 
 export interface FleetLayerHandle {
   setBuses(buses: CanonicalLiveBus[]): void;
   setSelected(id: string | null): void;
   destroy(): void;
+}
+
+interface HitPoint {
+  x: number;
+  y: number;
+  bus: CanonicalLiveBus;
+}
+
+function worldX(lng: number): number {
+  return TILE_SIZE * (0.5 + lng / 360);
+}
+
+function worldY(lat: number): number {
+  // Clamped short of the poles, where the Mercator projection diverges.
+  const siny = Math.min(Math.max(Math.sin((lat * Math.PI) / 180), -0.9999), 0.9999);
+  return TILE_SIZE * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI));
+}
+
+/**
+ * Marker size tapers as the camera pulls back. Statewide, full-size chevrons
+ * merge into one slab of colour; a smaller mark keeps individual vehicles
+ * distinguishable without hiding any of them.
+ */
+function markerScaleFor(zoom: number): number {
+  if (zoom <= 7) return 0.55;
+  if (zoom <= 9) return 0.7;
+  if (zoom <= 11) return 0.85;
+  return 1;
 }
 
 export function createFleetLayer(
@@ -48,8 +80,8 @@ export function createFleetLayer(
   let selectedId: string | null = null;
   let redrawQueued = false;
 
-  /** Populated on each draw so click hit-testing matches exactly what is drawn. */
-  let hitCells: Cell[] = [];
+  /** Screen positions painted in the last frame, so hit-testing matches exactly what is drawn. */
+  let hits: HitPoint[] = [];
 
   class FleetOverlay extends google.maps.OverlayView {
     private canvas: HTMLCanvasElement | null = null;
@@ -97,67 +129,67 @@ export function createFleetLayer(
       // the canvas so its origin stays aligned with the viewport top-left.
       const bounds = map.getBounds();
       if (!bounds) return;
-      const topLeft = projection.fromLatLngToDivPixel(
-        new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getSouthWest().lng()),
-      );
-      if (topLeft) {
-        canvas.style.transform = `translate(${topLeft.x}px, ${topLeft.y}px)`;
-      }
+      const anchorLat = bounds.getNorthEast().lat();
+      const anchorLng = bounds.getSouthWest().lng();
+      const anchor = new google.maps.LatLng(anchorLat, anchorLng);
+
+      const anchorDiv = projection.fromLatLngToDivPixel(anchor);
+      const anchorPixel = projection.fromLatLngToContainerPixel(anchor);
+      if (!anchorDiv || !anchorPixel) return;
+      canvas.style.transform = `translate(${anchorDiv.x}px, ${anchorDiv.y}px)`;
+
+      // Scale is read off the projection rather than map.getZoom() so markers
+      // stay welded to the basemap through animated zooms, where the reported
+      // zoom reaches its target before the projection does.
+      const scale = projection.getWorldWidth() / TILE_SIZE;
+      if (!Number.isFinite(scale) || scale <= 0) return;
+
+      const originX = anchorPixel.x - worldX(anchorLng) * scale;
+      const originY = anchorPixel.y - worldY(anchorLat) * scale;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, width, height);
 
-      // ---- Screen-space bucketing ----
-      const cells = new Map<number, Cell>();
-      const columns = Math.ceil(width / CELL_PX) + 1;
-      let selectedPoint: { x: number; y: number; bus: CanonicalLiveBus } | null = null;
+      const markerScale = markerScaleFor(map.getZoom() ?? 7);
+
+      // ---- Project every vehicle, batching by colour ----
+      const paths: Record<DataQuality, Path2D> = {
+        good: new Path2D(),
+        degraded: new Path2D(),
+        stale: new Path2D(),
+      };
+
+      hits = [];
+
+      let selected: HitPoint | null = null;
 
       for (const bus of buses) {
-        const point = projection.fromLatLngToContainerPixel(
-          new google.maps.LatLng(bus.latitude, bus.longitude),
-        );
-        if (!point) continue;
+        const x = originX + worldX(bus.longitude) * scale;
+        const y = originY + worldY(bus.latitude) * scale;
 
-        const x = point.x;
-        const y = point.y;
         // Cull generously so markers do not pop at the edges while panning.
         if (x < -60 || y < -60 || x > width + 60 || y > height + 60) continue;
 
         if (bus.id === selectedId) {
-          selectedPoint = { x, y, bus };
+          selected = { x, y, bus };
           continue;
         }
 
-        const key = Math.floor(y / CELL_PX) * columns + Math.floor(x / CELL_PX);
-        const cell = cells.get(key);
-        if (cell) {
-          cell.count += 1;
-          cell.sumX += x;
-          cell.sumY += y;
-        } else {
-          cells.set(key, { count: 1, sumX: x, sumY: y, bus, x, y });
-        }
+        appendChevron(paths[bus.dataQuality], x, y, bus.headingDegrees ?? 0, markerScale);
+        hits.push({ x, y, bus });
       }
 
-      // ---- Paint ----
-      hitCells = [];
-      for (const cell of cells.values()) {
-        const cx = cell.sumX / cell.count;
-        const cy = cell.sumY / cell.count;
-        cell.x = cx;
-        cell.y = cy;
-        hitCells.push(cell);
-
-        if (cell.count === 1) {
-          drawVehicle(ctx, cx, cy, cell.bus.headingDegrees ?? 0, QUALITY_COLOUR[cell.bus.dataQuality], 1);
-        } else {
-          drawCluster(ctx, cx, cy, cell.count);
-        }
+      // ---- Paint: one fill per colour, whatever the vehicle count ----
+      ctx.globalAlpha = 0.9;
+      for (const quality of QUALITIES) {
+        ctx.fillStyle = QUALITY_COLOUR[quality];
+        ctx.fill(paths[quality]);
       }
+      ctx.globalAlpha = 1;
 
-      if (selectedPoint) {
-        drawVehicle(ctx, selectedPoint.x, selectedPoint.y, selectedPoint.bus.headingDegrees ?? 0, SELECTED_COLOUR, 1.7);
-        hitCells.push({ count: 1, sumX: 0, sumY: 0, bus: selectedPoint.bus, x: selectedPoint.x, y: selectedPoint.y });
+      if (selected) {
+        drawSelectedVehicle(ctx, selected.x, selected.y, selected.bus.headingDegrees ?? 0);
+        hits.push(selected);
       }
     }
   }
@@ -181,24 +213,20 @@ export function createFleetLayer(
     const point = projection.fromLatLngToContainerPixel(event.latLng);
     if (!point) return;
 
-    let best: Cell | null = null;
-    let bestDistance = 18; // px hit radius
-    for (const cell of hitCells) {
-      const distance = Math.hypot(cell.x - point.x, cell.y - point.y);
+    // Nearest vehicle within the hit radius wins. Where markers overlap at low
+    // zoom the pick is arbitrary between neighbours, but selecting flies the
+    // camera to that vehicle's exact position, which resolves it visually.
+    let best: CanonicalLiveBus | null = null;
+    let bestDistance = 14; // px hit radius
+    for (const hit of hits) {
+      const distance = Math.hypot(hit.x - point.x, hit.y - point.y);
       if (distance < bestDistance) {
         bestDistance = distance;
-        best = cell;
+        best = hit.bus;
       }
     }
-    if (!best) return;
 
-    if (best.count > 1) {
-      // Zoom into a cluster rather than guessing which vehicle was meant.
-      map.panTo(event.latLng);
-      map.setZoom(Math.min(16, (map.getZoom() ?? 7) + 2));
-    } else {
-      onSelectBus(best.bus);
-    }
+    if (best) onSelectBus(best);
   });
 
   const moveListeners = [
@@ -225,60 +253,53 @@ export function createFleetLayer(
   };
 }
 
-/** Holographic vehicle chevron, rotated to the reported heading. */
-function drawVehicle(
+/**
+ * Add one heading-rotated chevron to a batch path.
+ *
+ * Vertices are rotated inline rather than through ctx.rotate() so thousands of
+ * markers can share a single path and a single fill call.
+ */
+function appendChevron(
+  path: Path2D,
+  cx: number,
+  cy: number,
+  heading: number,
+  scale: number,
+): void {
+  const radians = (heading * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+
+  const nose = NOSE_Y * scale;
+  const wingX = WING_X * scale;
+  const wingY = WING_Y * scale;
+  const tail = TAIL_Y * scale;
+
+  path.moveTo(cx - nose * sin, cy + nose * cos);
+  path.lineTo(cx + wingX * cos - wingY * sin, cy + wingX * sin + wingY * cos);
+  path.lineTo(cx - tail * sin, cy + tail * cos);
+  path.lineTo(cx - wingX * cos - wingY * sin, cy - wingX * sin + wingY * cos);
+  path.closePath();
+}
+
+/** The selected vehicle is drawn on its own, oversized and glowing, above the fleet. */
+function drawSelectedVehicle(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   heading: number,
-  colour: string,
-  scale: number,
 ): void {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate((heading * Math.PI) / 180);
-  ctx.scale(scale, scale);
-
-  ctx.beginPath();
-  ctx.moveTo(0, -7);
-  ctx.lineTo(4.4, 5.6);
-  ctx.lineTo(0, 2.8);
-  ctx.lineTo(-4.4, 5.6);
-  ctx.closePath();
-
-  ctx.fillStyle = colour;
-  ctx.globalAlpha = 0.9;
-  ctx.fill();
-
-  if (scale > 1.4) {
-    ctx.globalAlpha = 1;
-    ctx.lineWidth = 1.4;
-    ctx.strokeStyle = colour;
-    ctx.shadowColor = colour;
-    ctx.shadowBlur = 10;
-    ctx.stroke();
-  }
-
-  ctx.restore();
-}
-
-/** Cluster disc with a count label, matching the HUD language. */
-function drawCluster(ctx: CanvasRenderingContext2D, x: number, y: number, count: number): void {
-  const radius = Math.min(17, 8 + Math.log2(count + 1) * 1.5);
+  const path = new Path2D();
+  appendChevron(path, x, y, heading, 1.7);
 
   ctx.save();
-  ctx.beginPath();
-  ctx.arc(x, y, radius, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(11,58,82,0.82)';
-  ctx.fill();
-  ctx.lineWidth = 1.2;
-  ctx.strokeStyle = 'rgba(63,240,255,0.9)';
-  ctx.stroke();
+  ctx.fillStyle = SELECTED_COLOUR;
+  ctx.fill(path);
 
-  ctx.fillStyle = '#d9f6ff';
-  ctx.font = `600 ${radius > 13 ? 11 : 9}px ui-monospace, monospace`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(String(count), x, y);
+  ctx.lineWidth = 1.4;
+  ctx.strokeStyle = SELECTED_COLOUR;
+  ctx.shadowColor = SELECTED_COLOUR;
+  ctx.shadowBlur = 10;
+  ctx.stroke(path);
   ctx.restore();
 }

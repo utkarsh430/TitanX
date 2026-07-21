@@ -10,6 +10,14 @@ import type { ScheduleResponse } from '@/models/canonical';
  */
 export function useSchedule(): void {
   const selectedBusId = useCopilotStore((state) => state.selectedBusId);
+  /**
+   * The upstream keys schedules on the trip's operating date, so the vehicle's
+   * own scheduled_start_time date is sent rather than today's — an overnight
+   * service still runs under the date it departed.
+   */
+  const tripDate = useCopilotStore(
+    (state) => state.buses.find((bus) => bus.id === state.selectedBusId)?.tripDate ?? null,
+  );
   const setSchedule = useCopilotStore((state) => state.setSchedule);
   const setLoadingSchedule = useCopilotStore((state) => state.setLoadingSchedule);
   const logAudit = useCopilotStore((state) => state.logAudit);
@@ -28,10 +36,13 @@ export function useSchedule(): void {
 
     async function load(): Promise<void> {
       try {
-        const response = await fetch(
-          `/api/upsrtc/schedule?regNum=${encodeURIComponent(selectedBusId as string)}`,
-          { signal: controller.signal, cache: 'no-store' },
-        );
+        const query = new URLSearchParams({ regNum: selectedBusId as string });
+        if (tripDate) query.set('date', tripDate);
+
+        const response = await fetch(`/api/upsrtc/schedule?${query.toString()}`, {
+          signal: controller.signal,
+          cache: 'no-store',
+        });
         const payload = (await response.json()) as ScheduleResponse;
         if (cancelled) return;
 
@@ -56,5 +67,5 @@ export function useSchedule(): void {
       cancelled = true;
       controller.abort();
     };
-  }, [selectedBusId, setSchedule, setLoadingSchedule, logAudit]);
+  }, [selectedBusId, tripDate, setSchedule, setLoadingSchedule, logAudit]);
 }

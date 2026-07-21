@@ -28,6 +28,7 @@ const bus: CanonicalLiveBus = {
   lastUpdatedAt: '2026-07-20T10:00:05Z',
   ignitionOn: true,
   rawStatus: 'Live',
+  tripDate: '2026-07-20',
   dataQuality: 'good',
 };
 

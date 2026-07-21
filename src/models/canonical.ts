@@ -26,6 +26,12 @@ export const canonicalLiveBusSchema = z.object({
   lastUpdatedAt: z.string(),
   ignitionOn: z.boolean().nullable(),
   rawStatus: z.string().nullable(),
+  /**
+   * Operating date (YYYY-MM-DD) of the vehicle's current assignment. The
+   * schedule endpoint is keyed on this, not on today's calendar date — an
+   * overnight service still runs under the date it departed.
+   */
+  tripDate: z.string().nullable(),
   dataQuality: dataQualitySchema,
 });
 export type CanonicalLiveBus = z.infer<typeof canonicalLiveBusSchema>;

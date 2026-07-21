@@ -30,7 +30,22 @@
       "Bash(node ./shot.mjs)",
       "Bash(python3 -)",
       "Bash(git mv *)",
-      "Bash(mv docs/LIVE_VS_SIMULATED.md docs/LIVE_VS_PREDICTED.md)"
+      "Bash(mv docs/LIVE_VS_SIMULATED.md docs/LIVE_VS_PREDICTED.md)",
+      "Bash(curl -s -m 20 \"https://margdarshi.upsrtcvlt.com/php/getGpsLiveData.php\")",
+      "Bash(curl -s -m 20 \"https://margdarshi.upsrtcvlt.com/php/getScheduledBusInfo.php?date=2026-07-21&reg_num=UP78LT5904\")",
+      "Bash(curl -s -m 30 \"https://margdarshi.upsrtcvlt.com/php/getGpsLiveData.php\" -o live.json)",
+      "Bash(python3 -c ' *)",
+      "Bash(md5 src/components/map/fleetCanvasLayer.ts)",
+      "Bash(git fsck *)",
+      "Bash(npx vitest *)",
+      "Bash(curl -s -m 45 \"http://localhost:3000/api/upsrtc/schedule?regNum=UP70ET9389&date=2026-07-19\")",
+      "Bash(curl -s -m 20 \"https://margdarshi.upsrtcvlt.com/php/getScheduledBusInfo.php?date=2026-07-19&reg_num=UP70ET9389\")",
+      "Bash(node /private/tmp/claude-501/-Users-singh-Downloads-UPSRTC-AI-Copilot-Demo/c7615f2b-e471-4167-b578-a8f6662948c7/scratchpad/shot.mjs)",
+      "Bash(cp /private/tmp/claude-501/-Users-singh-Downloads-UPSRTC-AI-Copilot-Demo/c7615f2b-e471-4167-b578-a8f6662948c7/scratchpad/shot.mjs ./shot.tmp.mjs)",
+      "Bash(node ./shot.tmp.mjs)",
+      "Bash(npx next *)",
+      "Bash(git stash *)",
+      "Bash(pkill -f \"next dev\")"
     ]
   }
 }
